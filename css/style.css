@@ -344,14 +344,14 @@ code {
 
 .mobile-sheet-ctas {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, 1fr);
   gap: 8px;
   padding-top: 10px;
   border-top: 1px solid var(--border);
 }
 
 /* ==========================================================================
-   4. HERO (DOMAINUTAMA PSL, RAPOR WEBSITE & CEK KEAMANAN FILE)
+   4. HERO (DOMAINUTAMA PSL, RAPOR WEBSITE, CEK FILE & DETEKSI PHISHING)
    ========================================================================== */
 .hero {
   padding: clamp(48px, 7.5vw, 88px) 0 clamp(48px, 7vw, 76px);
@@ -739,7 +739,7 @@ code {
 }
 
 /* ==========================================================================
-   6. LAB KEAMANAN (ALAT UTAMA: DOMAINUTAMA PSL + RAPOR + CEK FILE)
+   6. LAB KEAMANAN (DOMAINUTAMA PSL + CEK FILE + DETEKSI LINK PHISHING)
    ========================================================================== */
 .lab-section {
   overflow: hidden;
@@ -823,9 +823,9 @@ code {
 
 .lab-switcher {
   display: inline-grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   width: 100%;
-  max-width: 540px;
+  max-width: 740px;
   gap: 6px;
   padding: 5px;
   border-radius: 9999px;
@@ -835,9 +835,9 @@ code {
 
 .lab-tab-btn {
   min-height: 42px;
-  padding: 8px 18px;
+  padding: 8px 16px;
   border-radius: 9999px;
-  font-size: clamp(13px, 2.1vw, 14px);
+  font-size: clamp(12.5px, 2vw, 13.5px);
   font-weight: 600;
   color: var(--text-secondary);
   display: inline-flex;
@@ -1327,6 +1327,25 @@ code {
   border-color: color-mix(in srgb, var(--red) 38%, transparent);
 }
 
+/* Risk Meter Bar (Deteksi Link Phishing) */
+.risk-meter-bar {
+  width: 100%;
+  max-width: 320px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--border-strong);
+  overflow: hidden;
+  margin-top: 10px;
+}
+
+.risk-meter-fill {
+  height: 100%;
+  width: 0%;
+  border-radius: 999px;
+  background: var(--green);
+  transition: width 0.35s ease, background-color 0.25s ease;
+}
+
 .obs-notice {
   padding: 13px 16px;
   border-radius: 12px;
@@ -1693,6 +1712,16 @@ code {
   .footer-cols { grid-template-columns: 1fr 1fr; }
 }
 
+@media (max-width: 720px) {
+  .lab-switcher {
+    grid-template-columns: 1fr;
+    border-radius: 18px;
+  }
+  .lab-tab-btn {
+    border-radius: 14px;
+  }
+}
+
 @media (max-width: 640px) {
   .features-bento,
   .cek-results-grid {
@@ -1702,20 +1731,16 @@ code {
     grid-column: span 1;
   }
 
-  .lab-switcher {
-    grid-template-columns: 1fr;
-    border-radius: 18px;
-  }
-  .lab-tab-btn {
-    border-radius: 14px;
-  }
-
   .cek-search-form { flex-direction: column; }
   .cek-input { border-radius: 14px; }
 
   .globe-layout {
     grid-template-columns: 1fr;
     text-align: center;
+  }
+
+  .mobile-sheet-ctas {
+    grid-template-columns: 1fr;
   }
 
   .footer-cols { grid-template-columns: 1fr; }
@@ -1728,7 +1753,6 @@ code {
   .hero-ctas .btn { width: 100%; }
   .rapor-metrics-grid, .gauges-row { grid-template-columns: 1fr; }
   .pipeline-steps { grid-template-columns: repeat(2, 1fr); }
-  .mobile-sheet-ctas { grid-template-columns: 1fr; }
 }
 
 @media (hover: none) {
