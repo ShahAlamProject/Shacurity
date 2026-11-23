@@ -330,6 +330,8 @@ async function analisisLinkPhishing(rawInput) {
   // 8. Verifikasi DNS & Umur Domain via RDAP (jika bukan IP)
   let infoDns = "Tidak diperiksa (Alamat IP)";
   let infoUmur = "Tidak tersedia";
+  let dnsTidakTersedia = false;
+  let rdapTidakTersedia = false;
 
   if (!isIpv4 && !isIpv6 && parsed.hostname.includes(".")) {
     const controller = new AbortController();
@@ -349,10 +351,16 @@ async function analisisLinkPhishing(rawInput) {
 
     if (dnsSettled.status === "fulfilled" && dnsSettled.value.ok) {
       const dnsJson = await dnsSettled.value.json().catch(() => null);
-      const ips = (dnsJson?.Answer || []).filter((a) => a.type === 1).map((a) => a.data);
-      infoDns = ips.length > 0 ? `Aktif (${ips.join(", ")})` : "Tidak ditemukan catatan DNS A aktif";
+      if (dnsJson && (dnsJson.Status === 0 || dnsJson.Status === 3)) {
+        const ips = (dnsJson.Answer || []).filter((a) => a.type === 1).map((a) => a.data);
+        infoDns = ips.length > 0 ? `Aktif (${ips.join(", ")})` : "Tidak ditemukan catatan DNS A aktif";
+      } else {
+        infoDns = "Respons DNS tidak valid";
+        dnsTidakTersedia = true;
+      }
     } else {
       infoDns = "Gagal mengecek DNS publik";
+      dnsTidakTersedia = true;
     }
 
     if (rdapSettled.status === "fulfilled" && rdapSettled.value.ok) {
@@ -360,7 +368,7 @@ async function analisisLinkPhishing(rawInput) {
       const regEvent = (rdapJson?.events || []).find(
         (ev) => ev.eventAction === "registration" || ev.eventAction === "registered"
       );
-      if (regEvent?.eventDate) {
+      if (rdapJson && Array.isArray(rdapJson.events) && regEvent?.eventDate) {
         const umurHari = hitungUmurHari(regEvent.eventDate);
         const tglIndo = formatTanggalId(regEvent.eventDate);
         if (umurHari !== null) {
@@ -381,8 +389,29 @@ async function analisisLinkPhishing(rawInput) {
             );
           }
         }
+      } else {
+        rdapTidakTersedia = true;
       }
+    } else {
+      rdapTidakTersedia = true;
     }
+  }
+
+  if (dnsTidakTersedia) {
+    indikator.push({
+      poin: 0,
+      level: "warn",
+      judul: "Pemeriksaan DNS Tidak Tersedia",
+      detail: "Layanan DNS publik tidak merespons. Reputasi dan keberadaan domain belum dapat dipastikan."
+    });
+  }
+  if (rdapTidakTersedia) {
+    indikator.push({
+      poin: 0,
+      level: "warn",
+      judul: "Data Registrasi Domain Tidak Tersedia",
+      detail: "Layanan RDAP tidak merespons. Umur domain tidak dapat dipastikan dan tidak dianggap sebagai bukti domain aman."
+    });
   }
 
   if (phishingSubmitBtn) phishingSubmitBtn.disabled = false;
@@ -394,8 +423,8 @@ async function analisisLinkPhishing(rawInput) {
 
   // Tentukan status akhir
   let statusKelas = "safe";
-  let judulKeputusan = "AMAN / RISIKO RENDAH";
-  let subKeputusan = "Tidak ditemukan indikator kuat manipulasi tautan maupun penyamaran domain.";
+  let judulKeputusan = "TIDAK ADA INDIKATOR KUAT";
+  let subKeputusan = "Heuristik lokal tidak menemukan indikator kuat manipulasi tautan maupun penyamaran domain.";
   let labelBadge = `RISIKO ${skorRisiko}/100`;
   let badgeExtraClass = "";
   let warnaMeter = "var(--green)";
@@ -406,10 +435,14 @@ async function analisisLinkPhishing(rawInput) {
     subKeputusan = "Ditemukan pola penipuan tautan atau penyamaran domain. Jangan memasukkan kredensial atau OTP.";
     badgeExtraClass = "grade-low";
     warnaMeter = "var(--red)";
-  } else if (skorRisiko >= 25) {
+  } else if (skorRisiko >= 25 || dnsTidakTersedia || rdapTidakTersedia) {
     statusKelas = "warn";
-    judulKeputusan = "PERLU WASPADA / VERIFIKASI ULANG";
-    subKeputusan = "Tautan memiliki beberapa karakteristik yang perlu dipastikan kebenarannya sebelum dibuka.";
+    judulKeputusan = dnsTidakTersedia || rdapTidakTersedia
+      ? "PEMERIKSAAN TIDAK LENGKAP / VERIFIKASI ULANG"
+      : "PERLU WASPADA / VERIFIKASI ULANG";
+    subKeputusan = dnsTidakTersedia || rdapTidakTersedia
+      ? "Sebagian pemeriksaan reputasi tidak tersedia. Skor rendah bukan jaminan tautan aman."
+      : "Tautan memiliki beberapa karakteristik yang perlu dipastikan kebenarannya sebelum dibuka.";
     badgeExtraClass = "grade-mid";
     warnaMeter = "var(--amber)";
   }

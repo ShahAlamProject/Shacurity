@@ -178,6 +178,14 @@ function ekstrakHostnameDariMasukan(rawInput) {
     };
   }
 
+  const labels = hostname.split(".");
+  if (labels.some((label) => label.length > 63 || label.startsWith("-") || label.endsWith("-") || !/^[a-z0-9-]+$/i.test(label))) {
+    return {
+      valid: false,
+      alasan: `Nama host <code>${escapeHtml(hostname)}</code> mengandung label domain yang tidak valid menurut format DNS.`
+    };
+  }
+
   return {
     valid: true,
     hostname,

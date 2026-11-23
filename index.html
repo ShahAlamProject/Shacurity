@@ -4,12 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Shacurity — DomainUtama (PSL), Rapor Website, Deteksi Link Phishing &amp; Cek File</title>
-  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/style.css?v=20261123-2300" />
 </head>
 <body>
 
   <!-- TERMS AND CONDITIONS GATE -->
-  <div class="terms-overlay" id="termsOverlay" role="dialog" aria-modal="true" aria-labelledby="termsTitle">
+  <div class="terms-overlay" id="termsOverlay" role="dialog" aria-modal="true" aria-labelledby="termsTitle" aria-describedby="termsDescription">
     <div class="terms-modal">
       <div class="terms-icon" aria-hidden="true">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -21,7 +21,7 @@
         <span class="eyebrow">Sebelum masuk</span>
         <h2 id="termsTitle">Syarat dan Ketentuan</h2>
       </div>
-      <div class="terms-scroll" tabindex="0">
+      <div class="terms-scroll" id="termsDescription" tabindex="0">
         <p>Dengan menggunakan Shacurity, Anda menyetujui ketentuan berikut:</p>
         <ul>
           <li><strong>Tujuan edukasi.</strong> Shacurity membantu pemeriksaan struktur domain, tautan phishing, konfigurasi web, dan jenis berkas. Hasilnya bukan jaminan bahwa situs atau berkas sepenuhnya aman.</li>
@@ -78,11 +78,9 @@
         <a href="#lab-keamanan" class="nav-cta-btn desktop-only">Mulai Periksa</a>
 
         <button class="mobile-open-btn" id="mobileMenuTrigger" aria-label="Buka menu" aria-expanded="false">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="4" y1="7" x2="20" y2="7"></line>
-            <line x1="4" y1="12" x2="20" y2="12"></line>
-            <line x1="4" y1="17" x2="20" y2="17"></line>
-          </svg>
+          <span class="menu-line menu-line-top"></span>
+          <span class="menu-line menu-line-middle"></span>
+          <span class="menu-line menu-line-bottom"></span>
         </button>
       </div>
     </header>
@@ -90,13 +88,13 @@
     <div class="mobile-sheet" id="mobileSheet">
       <nav class="mobile-nav-list">
         <a href="#features">Fitur Utama</a>
-        <a href="#lab-keamanan">Lab Keamanan (PSL, Deteksi Phishing &amp; Cek File)</a>
+        <a href="#lab-keamanan">Lab Keamanan</a>
         <a href="#faq">FAQ</a>
       </nav>
 
       <div class="mobile-sheet-ctas">
-        <a href="#lab-keamanan" class="btn btn-primary" data-mobile-tab="paneRaporDomain">Cek Domain</a>
-        <a href="#lab-keamanan" class="btn btn-secondary" data-mobile-tab="panePhishing">Cek Phishing</a>
+        <a href="#lab-keamanan" class="btn btn-primary" data-mobile-tab="paneRaporDomain">Cek Domain &amp; Link</a>
+        <a href="#lab-keamanan" class="btn btn-secondary" data-mobile-tab="paneCekEmail">Cek Email</a>
         <a href="#lab-keamanan" class="btn btn-secondary" data-mobile-tab="paneCekFile">Cek File</a>
       </div>
     </div>
@@ -131,159 +129,54 @@
     </section>
 
     <!-- ======================================================================
-         FITUR UTAMA (4 KARTU TERHUBUNG LANGSUNG KE LAB KEAMANAN)
+         FITUR UTAMA (3 KARTU TERHUBUNG LANGSUNG KE LAB KEAMANAN)
          ====================================================================== -->
     <section class="section border-top" id="features">
       <div class="container">
         <div class="section-header">
           <div class="eyebrow">Fitur Utama</div>
-          <h2 class="section-title">Empat Modul Verifikasi Domain, Web, Phishing &amp; File</h2>
+          <h2 class="section-title">Tiga Modul Verifikasi Domain, Link, File &amp; Email</h2>
           <p class="section-subtitle">
-            Dirancang untuk mahasiswa dan pengguna umum agar mampu membaca anatomi nama domain menggunakan Public Suffix List sebelum menilai keaslian alamat situs maupun berkas lampiran.
+            Dirancang untuk memeriksa domain dan tautan, keamanan file, serta konfigurasi dasar alamat email dari satu lab terintegrasi.
           </p>
         </div>
 
         <div class="features-bento">
-          <!-- FITUR 1: DomainUtama & Algoritma Public Suffix List -->
+          <!-- FITUR 1: Domain & Link Terpadu -->
           <article class="f-card" id="cardDomainFeature">
             <div class="f-visual">
               <div>
                 <div style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;margin-bottom:6px;">
-                  Simulasi Anatomi Public Suffix List
+                  Analisis Domain &amp; Tautan
                 </div>
                 <div class="domain-demo-bar" id="domainDemoBar">
                   <span style="color:var(--blue);font-weight:700;">infokhs.umm.ac.id</span>.<span style="color:var(--green);font-weight:700;">akun-verifikasi</span>.<span style="color:var(--amber);font-weight:700;">example</span>
                 </div>
                 <div class="domain-demo-badges" id="domainDemoBadges">
-                  <span class="mini-tag">Utama: akun-verifikasi.example</span>
-                  <span class="mini-tag warn">Domain Lain di Subdomain</span>
-                  <span class="mini-tag warn">6 Bagian</span>
+                  <span class="mini-tag">Public Suffix List</span>
+                  <span class="mini-tag warn">Risiko Link</span>
+                  <span class="mini-tag">RDAP &amp; DNS</span>
                 </div>
               </div>
 
               <div class="perf-preview-bar">
-                <span style="font-family:var(--font-mono);color:var(--text-primary);">PSL (ICANN &amp; PRIVATE)</span>
-                <span style="color:var(--green);font-size:11px;">Lisensi MPL-2.0</span>
+                <span style="font-family:var(--font-mono);color:var(--text-primary);">HTTP Observatory</span>
+                <span style="color:var(--green);font-size:11px;">Rapor Header &amp; TLS</span>
               </div>
             </div>
 
             <div class="f-card-footer">
               <div>
-                <h3>DomainUtama (Public Suffix List)</h3>
-                <p>Memecah URL menjadi subdomain, domain utama terdaftar, dan akhiran publik (ICANN/PRIVATE) untuk mengenali penyamaran subdomain.</p>
+                <h3>Cek Domain &amp; Link</h3>
+                <p>Pecah nama domain memakai PSL, analisis indikator phishing tautan, cek RDAP/DNS, dan tampilkan rapor konfigurasi HTTP.</p>
               </div>
               <button type="button" class="f-launch-btn" data-open-lab="paneRaporDomain">
-                Coba DomainUtama &rarr;
+                Buka Cek Domain &amp; Link &rarr;
               </button>
             </div>
           </article>
 
-          <!-- FITUR 2: Rapor Keamanan HTTP (MDN Observatory) -->
-          <article class="f-card" id="cardPerf">
-            <div class="f-visual">
-              <div class="gauges-row">
-                <div class="gauge-box">
-                  <div class="gauge-ring">
-                    <svg viewBox="0 0 48 48">
-                      <circle cx="24" cy="24" r="20" fill="none" stroke="var(--border)" stroke-width="3.5"/>
-                      <circle class="gauge-arc" cx="24" cy="24" r="20" fill="none" stroke="var(--green)" stroke-width="3.5" stroke-dasharray="125.6" stroke-dashoffset="125.6" stroke-linecap="round"/>
-                    </svg>
-                    <span class="gauge-num">0</span>
-                  </div>
-                  <span class="gauge-title">HSTS</span>
-                </div>
-                <div class="gauge-box">
-                  <div class="gauge-ring">
-                    <svg viewBox="0 0 48 48">
-                      <circle cx="24" cy="24" r="20" fill="none" stroke="var(--border)" stroke-width="3.5"/>
-                      <circle class="gauge-arc" cx="24" cy="24" r="20" fill="none" stroke="var(--green)" stroke-width="3.5" stroke-dasharray="125.6" stroke-dashoffset="125.6" stroke-linecap="round"/>
-                    </svg>
-                    <span class="gauge-num">0</span>
-                  </div>
-                  <span class="gauge-title">CSP</span>
-                </div>
-                <div class="gauge-box">
-                  <div class="gauge-ring">
-                    <svg viewBox="0 0 48 48">
-                      <circle cx="24" cy="24" r="20" fill="none" stroke="var(--border)" stroke-width="3.5"/>
-                      <circle class="gauge-arc" cx="24" cy="24" r="20" fill="none" stroke="var(--green)" stroke-width="3.5" stroke-dasharray="125.6" stroke-dashoffset="125.6" stroke-linecap="round"/>
-                    </svg>
-                    <span class="gauge-num">0</span>
-                  </div>
-                  <span class="gauge-title">X-Frame</span>
-                </div>
-                <div class="gauge-box">
-                  <div class="gauge-ring">
-                    <svg viewBox="0 0 48 48">
-                      <circle cx="24" cy="24" r="20" fill="none" stroke="var(--border)" stroke-width="3.5"/>
-                      <circle class="gauge-arc" cx="24" cy="24" r="20" fill="none" stroke="var(--green)" stroke-width="3.5" stroke-dasharray="125.6" stroke-dashoffset="125.6" stroke-linecap="round"/>
-                    </svg>
-                    <span class="gauge-num">0</span>
-                  </div>
-                  <span class="gauge-title">TLS/HTTPS</span>
-                </div>
-              </div>
-
-              <div class="perf-tabs">
-                <button class="perf-tab active" data-detail="Grade A+ &bull; Skor 100/100 &bull; 10/10 Tes Lolos">MDN Grade</button>
-                <button class="perf-tab" data-detail="Content-Security-Policy &bull; Anti-XSS Aktif">CSP Header</button>
-                <button class="perf-tab" data-detail="Strict-Transport-Security &bull; HTTPS Wajib">HSTS</button>
-                <button class="perf-tab" data-detail="X-Content-Type-Options &bull; Anti-Sniffing">MIME Lock</button>
-              </div>
-
-              <div class="perf-preview-bar">
-                <span style="font-family:var(--font-mono);color:var(--text-primary);">MDN Observatory v2</span>
-                <span id="perfDetailText" style="color:var(--text-muted);font-size:10.5px;">Grade A+ &bull; Skor 100/100 &bull; 10/10 Tes Lolos</span>
-              </div>
-            </div>
-
-            <div class="f-card-footer">
-              <div>
-                <h3>Rapor Keamanan Website</h3>
-                <p>Menampilkan nilai (Grade), skor keamanan HTTP, daftar tes header keamanan yang lolos maupun perlu perbaikan, serta data RDAP/DNS.</p>
-              </div>
-              <button type="button" class="f-launch-btn" data-open-lab="paneRaporDomain">
-                Lihat Rapor Website &rarr;
-              </button>
-            </div>
-          </article>
-
-          <!-- FITUR 3: Deteksi Link Phishing & Privasi Lokal (DITUKAR KE POSISI 3) -->
-          <article class="f-card" id="cardGlobe">
-            <div class="f-visual">
-              <div class="globe-layout">
-                <div class="globe-canvas-wrap">
-                  <canvas id="globeCanvas" width="148" height="148"></canvas>
-                </div>
-                <div class="globe-stats-col">
-                  <div class="globe-stat-item">
-                    <span style="color:var(--text-secondary);">Deteksi Phishing</span>
-                    <strong style="color:var(--green);">Trik @ &amp; Typo</strong>
-                  </div>
-                  <div class="globe-stat-item">
-                    <span style="color:var(--text-secondary);">Upload File</span>
-                    <strong style="color:var(--green);">0 Byte (Lokal)</strong>
-                  </div>
-                  <div class="globe-stat-item">
-                    <span style="color:var(--text-secondary);">Cek Umur Domain</span>
-                    <strong>RDAP &amp; DNS Live</strong>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="f-card-footer">
-              <div>
-                <h3>Deteksi Link Phishing Tanpa Klik</h3>
-                <p>Menganalisis tautan mencurigakan tanpa mengunjungi situsnya—mendeteksi manipulasi karakter @, penyamaran merek, typosquatting, dan domain baru.</p>
-              </div>
-              <button type="button" class="f-launch-btn" data-open-lab="panePhishing">
-                Cek Link Phishing &rarr;
-              </button>
-            </div>
-          </article>
-
-          <!-- FITUR 4: Cek Keamanan File & Alasan Penilaian (DITUKAR KE POSISI 4) -->
+          <!-- FITUR 2: Cek Keamanan File -->
           <article class="f-card" id="cardDeploy">
             <div class="f-visual">
               <div class="pipeline-steps" id="pipelineSteps">
@@ -301,13 +194,48 @@
             <div class="f-card-footer">
               <div>
                 <h3>Cek Keamanan File + Alasan</h3>
-                <p>Mencocokkan header biner asli file dengan ekstensinya, mendeteksi ekstensi ganda, menghitung MD5 &amp; SHA-256, dan menjelaskan alasan penilaiannya.</p>
+                <p>Mencocokkan header biner file dengan ekstensinya, mendeteksi ekstensi ganda dan pola uji EICAR, menghitung SHA-256, serta menjelaskan batas pemeriksaannya.</p>
               </div>
               <button type="button" class="f-launch-btn" data-open-lab="paneCekFile">
                 Buka Cek File &rarr;
               </button>
             </div>
           </article>
+
+          <!-- FITUR 3: Cek Email -->
+          <article class="f-card" id="cardEmailFeature">
+            <div class="f-visual">
+              <div>
+                <div style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;margin-bottom:6px;">
+                  Validasi Email &amp; DNS
+                </div>
+                <div class="domain-demo-bar">
+                  <span style="color:var(--blue);font-weight:700;">nama</span>@<span style="color:var(--green);font-weight:700;">contoh.ac.id</span>
+                </div>
+                <div class="domain-demo-badges">
+                  <span class="mini-tag">Format Email</span>
+                  <span class="mini-tag warn">MX &amp; SPF</span>
+                  <span class="mini-tag">DMARC</span>
+                </div>
+              </div>
+
+              <div class="perf-preview-bar">
+                <span style="font-family:var(--font-mono);color:var(--text-primary);">DNS Publik Google</span>
+                <span style="color:var(--green);font-size:11px;">Tanpa Login Akun</span>
+              </div>
+            </div>
+
+            <div class="f-card-footer">
+              <div>
+                <h3>Cek Email</h3>
+                <p>Validasi format alamat, klasifikasi domain, pemeriksaan MX/SPF/DMARC, serta indikator penyamaran merek atau domain sementara.</p>
+              </div>
+              <button type="button" class="f-launch-btn" data-open-lab="paneCekEmail">
+                Buka Cek Email &rarr;
+              </button>
+            </div>
+          </article>
+
         </div>
       </div>
     </section>
@@ -355,20 +283,20 @@
                     <path d="M2 12h20"></path>
                     <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
                   </svg>
-                  <span>Rapor &amp; CekDomain (PSL)</span>
+                  <span>Cek Domain &amp; Link</span>
                 </button>
                 <button
                   type="button"
                   class="lab-tab-btn"
                   role="tab"
                   aria-selected="false"
-                  data-lab-tab="panePhishing"
+                  data-lab-tab="paneCekEmail"
                 >
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
-                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                    <rect x="3" y="5" width="18" height="14" rx="2"></rect>
+                    <polyline points="3 7 12 13 21 7"></polyline>
                   </svg>
-                  <span>Deteksi Link Phishing</span>
+                  <span>Cek Email</span>
                 </button>
                 <button
                   type="button"
@@ -391,22 +319,6 @@
                  TAB 1: DOMAINUTAMA (PSL) + RAPOR WEBSITE TERPADU
                  ================================================================ -->
             <div class="lab-pane active" id="paneRaporDomain" role="tabpanel">
-              <div class="psl-control-bar">
-                <div class="psl-info-group">
-                  <span style="font-weight:600;color:var(--text-primary);">Basis Aturan PSL:</span>
-                  <span class="psl-count-badge" id="pslStatusBadge">Daftar Ringkas Bawaan (19 aturan)</span>
-                  <span id="pslSourceNote" style="font-size:12px;">Sumber: publicsuffix.org (MPL-2.0)</span>
-                </div>
-                <button type="button" class="btn btn-secondary" id="loadFullPslBtn" style="min-height:36px;padding:6px 14px;font-size:12.5px;">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                    <polyline points="7 10 12 15 17 10"></polyline>
-                    <line x1="12" y1="15" x2="12" y2="3"></line>
-                  </svg>
-                  <span id="loadFullPslLabel">Muat Public Suffix List Lengkap</span>
-                </button>
-              </div>
-
               <div class="lab-callout" role="note">
                 <span class="callout-icon-pill amber" aria-hidden="true">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -416,7 +328,7 @@
                   </svg>
                 </span>
                 <div>
-                  <strong>Peringatan Etika Pemeriksaan:</strong> Gunakan alat ini hanya untuk belajar memahami struktur domain serta konfigurasi keamanan situs milik sendiri atau situs lain bila relevan, dan <strong>tidak untuk mempermalukan atau menyudutkan pihak lain</strong>. Aplikasi tidak pernah membuka halaman situs yang diperiksa.
+                  <strong>Peringatan Etika Pemeriksaan:</strong> Gunakan alat ini untuk belajar memahami struktur domain dan keamanan situs milik sendiri atau yang relevan. Jangan digunakan untuk mempermalukan atau menyudutkan pihak lain.
                 </div>
               </div>
 
@@ -440,7 +352,7 @@
                   />
                 </div>
                 <button type="submit" class="btn btn-primary" id="submitBtn" style="padding-inline:24px;">
-                  <span>Pecah Domain &amp; Rapor</span>
+                  <span>Periksa Domain &amp; Link</span>
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                     <path d="M5 12h14"></path>
                     <path d="m12 5 7 7-7 7"></path>
@@ -454,9 +366,37 @@
                 <button type="button" class="example-chip" data-example="www.bbc.co.uk">www.bbc.co.uk</button>
                 <button type="button" class="example-chip" data-example="praktikum-umm.github.io">praktikum-umm.github.io</button>
                 <button type="button" class="example-chip" data-example="infokhs.umm.ac.id.akun-verifikasi.example">infokhs.umm.ac.id.akun-verifikasi.example</button>
+                <button type="button" class="example-chip" data-example="http://infokhs.umm.ac.id@verifikasi-akun-mahasiswa.xyz/login">Contoh link phishing @</button>
               </div>
 
+              <div class="psl-control-bar psl-control-bar-compact">
+                <div class="psl-info-group">
+                  <span style="font-weight:600;color:var(--text-primary);">Basis PSL:</span>
+                  <span class="psl-count-badge" id="pslStatusBadge">Daftar Ringkas Bawaan (19 aturan)</span>
+                  <span id="pslSourceNote" style="font-size:12px;">Sumber: publicsuffix.org (MPL-2.0)</span>
+                </div>
+                <button type="button" class="btn btn-secondary" id="loadFullPslBtn" style="min-height:36px;padding:6px 14px;font-size:12.5px;">
+                  <span id="loadFullPslLabel">Muat PSL Lengkap</span>
+                </button>
+              </div>
+              <p class="psl-help-text">
+                PSL (Public Suffix List) membantu mengenali akhiran domain publik, seperti <code>.co.uk</code> atau <code>.ac.id</code>,
+                agar pemeriksa dapat membedakan domain utama dari subdomain. Daftar lengkap memerlukan koneksi internet; daftar ringkas bawaan tetap digunakan jika tidak dimuat.
+              </p>
+
               <div class="cek-status-banner" id="statusBanner" role="status" aria-live="polite"></div>
+
+              <div class="unified-risk-summary" id="unifiedRiskSummary" style="display:none;">
+                <div class="unified-risk-score">
+                  <span class="cek-card-label">Risiko Link / Phishing</span>
+                  <strong id="unifiedRiskTitle">-</strong>
+                  <span id="unifiedRiskText" class="unified-risk-text">Belum diperiksa</span>
+                </div>
+                <div class="risk-meter-bar" aria-hidden="true">
+                  <div class="risk-meter-fill" id="unifiedRiskMeter"></div>
+                </div>
+                <span class="grade-badge" id="unifiedRiskBadge">-</span>
+              </div>
 
               <div id="resultsArea" style="display:none;">
                 <div class="group-heading">
@@ -613,113 +553,6 @@
             </div>
 
             <!-- ================================================================
-                 TAB 2: DETEKSI LINK PHISHING (HEURISTIK URL + PSL + RDAP)
-                 ================================================================ -->
-            <div class="lab-pane" id="panePhishing" role="tabpanel">
-              <div class="lab-callout" role="note">
-                <span class="callout-icon-pill amber" aria-hidden="true">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-                    <line x1="12" y1="8" x2="12" y2="12"></line>
-                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                  </svg>
-                </span>
-                <div>
-                  <strong>Pemeriksaan Tautan Aman Tanpa Mengunjungi Situs:</strong> Tautan yang Anda tempel akan diurai strukturnya secara lokal (deteksi karakter <code>@</code>, penyamaran merek, <em>typosquatting</em>, kata kunci OTP, URL <em>shortener</em>, serta umur domain RDAP) tanpa pernah membuka halaman target.
-                </div>
-              </div>
-
-              <form class="cek-search-form" id="phishingForm" novalidate>
-                <div class="cek-input-wrap">
-                  <span class="cek-input-icon" aria-hidden="true">
-                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
-                      <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
-                    </svg>
-                  </span>
-                  <input
-                    type="text"
-                    id="phishingUrlInput"
-                    class="cek-input"
-                    placeholder="Tempel tautan mencurigakan di sini (misal: http://umm.ac.id@verifikasi-akun.xyz/login)"
-                    autocomplete="off"
-                    spellcheck="false"
-                    aria-label="Tempel URL untuk diperiksa indikasi phishing"
-                    required
-                  />
-                </div>
-                <button type="submit" class="btn btn-primary" id="phishingSubmitBtn" style="padding-inline:24px;">
-                  <span>Periksa Link</span>
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M5 12h14"></path>
-                    <path d="m12 5 7 7-7 7"></path>
-                  </svg>
-                </button>
-              </form>
-
-              <div class="cek-examples">
-                <span>Contoh uji tautan:</span>
-                <button type="button" class="example-chip" data-phishing-example="http://infokhs.umm.ac.id@verifikasi-akun-mahasiswa.xyz/login">Trik @ + TLD .xyz</button>
-                <button type="button" class="example-chip" data-phishing-example="https://klikbca-verifikasi-blokir.pages.dev/otp">Penyamaran Bank + PRIVATE</button>
-                <button type="button" class="example-chip" data-phishing-example="https://bit.ly/klaim-hadiah-resmi">URL Shortener + Umpan</button>
-                <button type="button" class="example-chip" data-phishing-example="https://infokhs.umm.ac.id">Tautan Resmi Aman</button>
-              </div>
-
-              <div class="cek-status-banner" id="phishingStatusBanner" role="status" aria-live="polite"></div>
-
-              <div id="phishingResultArea" style="display:none;">
-                <div class="file-verdict-banner" id="phishingVerdictBanner">
-                  <div style="flex:1;min-width:220px;">
-                    <div style="font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-muted);">
-                      Hasil Deteksi Link Phishing
-                    </div>
-                    <div style="font-size:1.15rem;font-weight:800;margin-top:2px;" id="phishingVerdictTitle">-</div>
-                    <div style="font-size:13px;color:var(--text-secondary);margin-top:2px;" id="phishingVerdictSubtitle">-</div>
-                    <div class="risk-meter-bar" aria-hidden="true">
-                      <div class="risk-meter-fill" id="phishingMeterFill"></div>
-                    </div>
-                  </div>
-                  <span class="grade-badge" id="phishingRiskBadge" style="font-size:0.85rem;padding-inline:14px;">-</span>
-                </div>
-
-                <div class="cek-results-grid">
-                  <div class="cek-card">
-                    <div class="cek-card-label">Host Tujuan Sebenarnya</div>
-                    <div class="cek-card-value" id="phishingTargetHost">-</div>
-                    <div class="cek-card-note" id="phishingProtocolInfo">-</div>
-                  </div>
-
-                  <div class="cek-card">
-                    <div class="cek-card-label">Umur Domain &amp; Status DNS</div>
-                    <div class="cek-card-value" id="phishingDomainAge">-</div>
-                    <div class="cek-card-note" id="phishingDnsInfo">-</div>
-                  </div>
-
-                  <div class="cek-card full-span">
-                    <div class="cek-card-label">Rincian Indikator &amp; Alasan Analisis Phishing</div>
-                    <ul class="warning-list" id="phishingIndicatorsList"></ul>
-                  </div>
-                </div>
-
-                <div class="cek-actions-bar">
-                  <span style="font-size:12px;color:var(--text-muted);">Ingin melihat anatomi PSL lengkap &amp; header HTTP situs ini?</span>
-                  <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                    <button type="button" class="btn btn-secondary" id="copyPhishingReportBtn" style="min-height:38px;font-size:13px;">
-                      <span>Salin Laporan</span>
-                    </button>
-                    <button type="button" class="btn btn-secondary" id="inspectInPslBtn" style="min-height:38px;font-size:13px;">
-                      <span>Buka di Tab PSL &amp; Rapor &rarr;</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              <div class="cek-disclaimer">
-                <strong>Catatan Penting:</strong> Skor risiko phishing dihitung berdasarkan analisis struktur URL, basis aturan Public Suffix List, serta umur pendaftaran domain RDAP. Jika Anda ragu terhadap tautan pesan/email, jangan pernah memasukkan kata sandi atau kode OTP.
-              </div>
-            </div>
-
-            <!-- ================================================================
                  TAB 3: CEK KEAMANAN FILE (DENGAN ALASAN & PENJELASAN LENGKAP)
                  ================================================================ -->
             <div class="lab-pane" id="paneCekFile" role="tabpanel">
@@ -731,7 +564,7 @@
                   </svg>
                 </span>
                 <div>
-                  <strong>Privasi Terjaga 100% Lokal:</strong> File Anda <strong>tidak diunggah ke server mana pun</strong>. Pemeriksaan ekstensi ganda, kecocokan <em>magic bytes</em> (tanda tangan biner asli file), serta perhitungan sidik jari <strong>MD5 &amp; SHA-256</strong> dilakukan langsung di perangkat Anda.
+                  <strong>Pemeriksaan lokal:</strong> File Anda <strong>tidak diunggah ke server mana pun</strong>. Tidak ada batas ukuran yang ditetapkan aplikasi, tetapi file besar mungkin melebihi kemampuan memori browser/perangkat. Pemeriksaan struktur dan hash <strong>bukan pemindaian antivirus</strong> dan tidak dapat memastikan file bebas malware.
                 </div>
               </div>
 
@@ -758,7 +591,7 @@
                 <button type="button" class="example-chip" data-file-sim="spoofed-pdf">KHS_Mahasiswa.pdf.exe (Penyamaran)</button>
                 <button type="button" class="example-chip" data-file-sim="trusted-exe">Installer_Resmi_App.exe (Program Eksekusi)</button>
                 <button type="button" class="example-chip" data-file-sim="apk-undangan">Undangan_Resmi.apk (Berisiko Tinggi)</button>
-                <button type="button" class="example-chip" data-file-sim="safe-pdf">Panduan_Akademik.pdf (Aman)</button>
+                <button type="button" class="example-chip" data-file-sim="safe-pdf">Panduan_Akademik.pdf (Risiko Rendah)</button>
               </div>
 
               <div id="fileResultArea" style="display:none;">
@@ -793,13 +626,7 @@
                   </div>
 
                   <div class="cek-card full-span">
-                    <div class="cek-card-label">Sidik Jari Integritas Data (MD5 &amp; SHA-256)</div>
-                    <div class="sha-box">
-                      <div>
-                        <div style="color:var(--text-muted);font-size:11px;">MD5</div>
-                        <div id="fileMd5Val">-</div>
-                      </div>
-                    </div>
+                    <div class="cek-card-label">Sidik Jari Integritas Data (SHA-256)</div>
                     <div class="sha-box">
                       <div>
                         <div style="color:var(--text-muted);font-size:11px;">SHA-256</div>
@@ -813,14 +640,6 @@
                           </svg>
                           <span>Salin SHA-256</span>
                         </button>
-                        <a id="vtLookupLink" href="https://www.virustotal.com" target="_blank" rel="noopener noreferrer" class="btn btn-secondary" style="min-height:34px;padding:4px 13px;font-size:12px;">
-                          <span>Cek Hash di VirusTotal</span>
-                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-                            <polyline points="15 3 21 3 21 9"></polyline>
-                            <line x1="10" y1="14" x2="21" y2="3"></line>
-                          </svg>
-                        </a>
                       </div>
                     </div>
                   </div>
@@ -828,7 +647,88 @@
               </div>
 
               <div class="cek-disclaimer">
-                <strong>Catatan Penting:</strong> Pemeriksaan lokal ini mendeteksi penyamaran tipe file (<em>magic bytes mismatch</em>), ekstensi ganda (seperti <code>.pdf.exe</code>), serta format program eksekusi (<code>.exe</code>, <code>.apk</code>, dll.). Jika Anda mengunduh <code>.exe</code> resmi dari situs pengembang terpercaya, pastikan tanda tangan digital penerbitnya valid dan cocokkan hash SHA-256 di VirusTotal.
+                <strong>Catatan Penting:</strong> Pemeriksaan ini hanya mendeteksi beberapa indikator struktur file, pola uji EICAR, dan format program. Ia bukan antivirus dan tidak dapat memastikan file bebas malware; file yang tidak terdeteksi tetap bisa mengandung malware. Untuk pemindaian menyeluruh, gunakan antivirus lokal tepercaya dan jangan jalankan file yang tidak dipercaya.
+              </div>
+            </div>
+
+            <!-- ================================================================
+                 TAB 4: CEK EMAIL
+                 ================================================================ -->
+            <div class="lab-pane" id="paneCekEmail" role="tabpanel">
+              <div class="lab-callout" role="note">
+                <span class="callout-icon-pill amber" aria-hidden="true">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="5" width="18" height="14" rx="2"></rect>
+                    <polyline points="3 7 12 13 21 7"></polyline>
+                  </svg>
+                </span>
+                <div>
+                  <strong>Pemeriksaan Email Aman:</strong> Validasi format dilakukan di browser. Pemeriksaan MX, SPF, dan DMARC memakai DNS publik Google. Alamat email tidak dikirim ke server pengirim atau dicoba login.
+                </div>
+              </div>
+
+              <form class="cek-search-form" id="emailCheckerForm" novalidate>
+                <div class="cek-input-wrap">
+                  <span class="cek-input-icon" aria-hidden="true">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="3" y="5" width="18" height="14" rx="2"></rect>
+                      <polyline points="3 7 12 13 21 7"></polyline>
+                    </svg>
+                  </span>
+                  <input
+                    type="email"
+                    id="emailInput"
+                    class="cek-input"
+                    placeholder="Masukkan alamat email, misal: admin@contoh.ac.id"
+                    autocomplete="email"
+                    spellcheck="false"
+                    aria-label="Alamat email untuk diperiksa"
+                    required
+                  />
+                </div>
+                <button type="submit" class="btn btn-primary" id="emailSubmitBtn" style="padding-inline:24px;">
+                  <span>Periksa Email</span>
+                </button>
+              </form>
+
+              <div class="cek-examples">
+                <span>Contoh uji:</span>
+                <button type="button" class="example-chip" data-email-example="admin@umm.ac.id">admin@umm.ac.id</button>
+                <button type="button" class="example-chip" data-email-example="verifikasi-akun@bca-resmi.example">Domain .example mencurigakan</button>
+              </div>
+
+              <div class="cek-status-banner" id="emailStatusBanner" role="status" aria-live="polite"></div>
+
+              <div id="emailResultArea" style="display:none;">
+                <div class="file-verdict-banner" id="emailVerdictBanner">
+                  <div>
+                    <div style="font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-muted);">Status Pemeriksaan Email</div>
+                    <div style="font-size:1.15rem;font-weight:800;margin-top:2px;" id="emailVerdictTitle">-</div>
+                    <div style="font-size:13px;color:var(--text-secondary);margin-top:2px;" id="emailVerdictSubtitle">-</div>
+                  </div>
+                  <span class="grade-badge" id="emailRiskBadge">-</span>
+                </div>
+
+                <div class="cek-results-grid">
+                  <div class="cek-card">
+                    <div class="cek-card-label">Nama &amp; Domain</div>
+                    <div class="cek-card-value" id="emailLocalPart">-</div>
+                    <div class="cek-card-note" id="emailDomainValue">-</div>
+                  </div>
+                  <div class="cek-card">
+                    <div class="cek-card-label">Klasifikasi Domain</div>
+                    <div class="cek-card-value" id="emailDomainType">-</div>
+                    <div class="cek-card-note" id="emailDomainNote">-</div>
+                  </div>
+                  <div class="cek-card full-span">
+                    <div class="cek-card-label">Indikator DNS Email</div>
+                    <ul class="warning-list" id="emailIndicatorsList"></ul>
+                  </div>
+                </div>
+              </div>
+
+              <div class="cek-disclaimer">
+                <strong>Batas Pemeriksaan:</strong> Format dan DNS tidak membuktikan kepemilikan kotak masuk, identitas pengirim, atau keaslian pesan sebelumnya. SPF/DMARC perlu dipahami bersama header email lengkap.
               </div>
             </div>
           </div>
@@ -847,33 +747,53 @@
         </div>
 
         <div class="faq-container">
-          <div class="faq-item open">
-            <button class="faq-btn">
+          <div class="faq-item">
+            <button class="faq-btn" id="faqQuestion1" type="button" aria-expanded="false" aria-controls="faqAnswer1">
               <span>Apa perbedaan akhiran ICANN dan PRIVATE pada Public Suffix List?</span>
               <span class="faq-symbol">+</span>
             </button>
-            <div class="faq-body">
+            <div class="faq-body" id="faqAnswer1" role="region" aria-labelledby="faqQuestion1" aria-hidden="true">
               Bagian <strong>ICANN</strong> dikelola oleh registri domain resmi (seperti <code>.com</code>, <code>.ac.id</code>, <code>.co.uk</code>), sedangkan bagian <strong>PRIVATE</strong> diajukan oleh penyedia layanan/platform (seperti <code>github.io</code>, <code>pages.dev</code>, <code>vercel.app</code>, <code>netlify.app</code>) agar setiap proyek pengguna dianggap sebagai domain utama terpisah. Karena siapa saja dapat membuat akun dan mendaftarkan nama di bawah akhiran PRIVATE, alamat berakhiran PRIVATE perlu diverifikasi sumbernya.
             </div>
           </div>
 
           <div class="faq-item">
-            <button class="faq-btn">
+            <button class="faq-btn" id="faqQuestion2" type="button" aria-expanded="false" aria-controls="faqAnswer2">
               <span>Bagaimana cara kerja trik karakter @ pada tautan phishing?</span>
               <span class="faq-symbol">+</span>
             </button>
-            <div class="faq-body">
+            <div class="faq-body" id="faqAnswer2" role="region" aria-labelledby="faqQuestion2" aria-hidden="true">
               Pada standar URL, bagian sebelum tanda <code>@</code> dianggap sebagai info otentikasi pengguna, sedangkan alamat server tujuan sebenarnya berada setelah tanda <code>@</code>. Pada contoh <code>http://umm.ac.id@verifikasi.xyz</code>, browser akan mengabaikan <code>umm.ac.id</code> dan membuka <code>verifikasi.xyz</code>.
             </div>
           </div>
 
           <div class="faq-item">
-            <button class="faq-btn">
+            <button class="faq-btn" id="faqQuestion3" type="button" aria-expanded="false" aria-controls="faqAnswer3">
               <span>Apakah aplikasi ini membuka situs yang diperiksa atau mengunggah file?</span>
               <span class="faq-symbol">+</span>
             </button>
-            <div class="faq-body">
-              Tidak. Pemecahan nama domain memakai aturan Public Suffix List serta deteksi link phishing berjalan sepenuhnya di browser tanpa membuka situs target, dan pemeriksaan file memproses <em>magic bytes</em>, MD5, serta SHA-256 100% secara lokal di perangkat Anda.
+            <div class="faq-body" id="faqAnswer3" role="region" aria-labelledby="faqQuestion3" aria-hidden="true">
+              File tidak diunggah; pemeriksaannya berjalan di perangkat Anda. Browser Shacurity tidak menavigasi ke situs yang diperiksa, tetapi cek domain/email mengirim nama domain ke layanan DNS Google dan RDAP. Rapor HTTP juga meminta layanan MDN Observatory memindai host tersebut.
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-btn" id="faqQuestion4" type="button" aria-expanded="false" aria-controls="faqAnswer4">
+              <span>Apakah hasil risiko rendah berarti domain, email, atau file pasti aman?</span>
+              <span class="faq-symbol">+</span>
+            </button>
+            <div class="faq-body" id="faqAnswer4" role="region" aria-labelledby="faqQuestion4" aria-hidden="true">
+              Tidak. Pemeriksaan domain dan email memakai heuristik serta data DNS/RDAP yang tersedia, sedangkan pemeriksaan file mencocokkan struktur, pola uji EICAR, dan SHA-256. Ini bukan pemindaian antivirus atau jaminan bebas ancaman. Verifikasi melalui saluran resmi dan gunakan antivirus tepercaya untuk memindai file.
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-btn" id="faqQuestion5" type="button" aria-expanded="false" aria-controls="faqAnswer5">
+              <span>Apa fungsi Public Suffix List (PSL) di pemeriksaan domain?</span>
+              <span class="faq-symbol">+</span>
+            </button>
+            <div class="faq-body" id="faqAnswer5" role="region" aria-labelledby="faqQuestion5" aria-hidden="true">
+              PSL membantu mengenali batas akhiran publik—misalnya <code>.co.uk</code>—agar alat dapat membedakan domain utama dari subdomain. Daftar ringkas tersedia secara lokal; tombol “Muat PSL Lengkap” mengambil daftar terbaru melalui internet.
             </div>
           </div>
         </div>
@@ -939,10 +859,11 @@
         <div>
           <div class="footer-col-title">Alat Pemeriksaan</div>
           <ul class="footer-list">
-            <li><a href="#features">Empat Modul Utama</a></li>
+            <li><a href="#features">Tiga Modul Utama</a></li>
             <li><a href="#lab-keamanan" data-open-lab="paneRaporDomain">DomainUtama (PSL) &amp; Rapor</a></li>
-            <li><a href="#lab-keamanan" data-open-lab="panePhishing">Deteksi Link Phishing</a></li>
+            <li><a href="#lab-keamanan" data-open-lab="paneRaporDomain">Cek Domain &amp; Risiko Link</a></li>
             <li><a href="#lab-keamanan" data-open-lab="paneCekFile">Cek Keamanan File</a></li>
+            <li><a href="#lab-keamanan" data-open-lab="paneCekEmail">Cek Email</a></li>
             <li><a href="#faq">Pertanyaan Umum (FAQ)</a></li>
           </ul>
         </div>
@@ -953,7 +874,6 @@
             <li><a href="https://publicsuffix.org/" target="_blank" rel="noopener noreferrer">Public Suffix List (MPL-2.0)</a></li>
             <li><a href="https://developer.mozilla.org/en-US/observatory" target="_blank" rel="noopener noreferrer">MDN HTTP Observatory</a></li>
             <li><a href="https://about.rdap.org/" target="_blank" rel="noopener noreferrer">RDAP Registration Data</a></li>
-            <li><a href="https://www.virustotal.com/" target="_blank" rel="noopener noreferrer">VirusTotal Hash Lookup</a></li>
           </ul>
         </div>
       </div>
@@ -996,6 +916,7 @@
   <script src="js/psl.js"></script>
   <script src="js/file-checker.js"></script>
   <script src="js/phishing-checker.js"></script>
+  <script src="js/email-checker.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

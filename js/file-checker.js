@@ -41,16 +41,76 @@ function deteksiMagicBytes(uint8) {
   return { tipe: "Teks / Biner Umum", kategori: "unknown" };
 }
 
+function deteksiTandaUjiEicar(uint8) {
+  const signature = "X5O!P%@AP[4\\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*";
+  for (let i = 0; i <= uint8.length - signature.length; i++) {
+    let cocok = true;
+    for (let j = 0; j < signature.length; j++) {
+      if (uint8[i + j] !== signature.charCodeAt(j)) {
+        cocok = false;
+        break;
+      }
+    }
+    if (cocok) return true;
+  }
+  return false;
+}
+
 async function analisisFile(namaFile, ukuranBytes, tipeMime, arrayBuffer) {
   const uint8 = new Uint8Array(arrayBuffer);
-  const md5 = hitungMd5Hex(arrayBuffer);
-  const sha256 = await hitungSha256Hex(arrayBuffer);
-  currentFileSha = sha256;
+  const eicarTerdeteksi = deteksiTandaUjiEicar(uint8);
+  let sha256 = "Tidak dapat dihitung";
+  let hashGagal = false;
+  try {
+    sha256 = await hitungSha256Hex(arrayBuffer);
+    hashGagal = !/^[a-f0-9]{64}$/i.test(sha256);
+  } catch (error) {
+    hashGagal = true;
+    console.error("Gagal menghitung SHA-256 file:", error);
+  }
+  currentFileSha = hashGagal ? "" : sha256;
 
   const bagianNama = namaFile.toLowerCase().split(".");
   const ekstensiAkhir = bagianNama.length > 1 ? bagianNama[bagianNama.length - 1] : "(tanpa ekstensi)";
   const ekstensiSebelumnya = bagianNama.length > 2 ? bagianNama[bagianNama.length - 2] : null;
   const sig = deteksiMagicBytes(uint8);
+  const peringatan = [];
+  let tingkatRisiko = "safe";
+  const alasanRingkas = [];
+
+  const formatMagicCocok = {
+    pdf: sig.kategori === "document",
+    png: sig.kategori === "image",
+    jpg: sig.kategori === "image",
+    jpeg: sig.kategori === "image",
+    exe: sig.kategori === "executable",
+    elf: sig.kategori === "executable",
+    zip: sig.kategori === "archive_or_package",
+    rar: sig.kategori === "archive",
+    apk: sig.kategori === "archive_or_package"
+  };
+  const apakahMagicDapatDibuktikan = Object.prototype.hasOwnProperty.call(formatMagicCocok, ekstensiAkhir);
+  if (eicarTerdeteksi) {
+    tingkatRisiko = "danger";
+    alasanRingkas.push("pola uji antivirus EICAR terdeteksi di dalam file");
+    peringatan.push({
+      level: "danger",
+      teks: "Pola EICAR adalah file uji standar untuk memeriksa respons antivirus; pola ini bukan malware aktif dan tidak berarti pemeriksa ini mampu mendeteksi malware lain."
+    });
+  }
+
+  if (sig.kategori === "unknown" || (apakahMagicDapatDibuktikan && !formatMagicCocok[ekstensiAkhir])) {
+    tingkatRisiko = tingkatRisiko === "danger" ? "danger" : "warn";
+    alasanRingkas.push(
+      sig.kategori === "unknown"
+        ? `magic bytes awal tidak dikenali sehingga tipe format tidak dapat dipastikan`
+        : `magic bytes tidak cocok dengan ekstensi .${ekstensiAkhir}`
+    );
+    peringatan.push({
+      level: "warn",
+      teks: `Alasan — Tipe Biner Tidak Dapat Dipastikan: Pemeriksaan hanya membaca sebagian tanda tangan awal file. Untuk .${ekstensiAkhir}, hasil ini tidak cukup untuk menyimpulkan bahwa file aman atau berbahaya.`
+    });
+  }
 
   const ekstensiSkripBerbahaya = ["msi", "bat", "cmd", "scr", "ps1", "vbs", "js", "jse", "wsf", "jar", "apk", "com", "pif", "lnk", "iso", "img", "sh"];
   const ekstensiProgramStandar = ["exe"];
@@ -58,9 +118,14 @@ async function analisisFile(namaFile, ukuranBytes, tipeMime, arrayBuffer) {
   const ekstensiDokumenUmum = ["pdf", "doc", "docx", "xls", "xlsx", "ppt", "pptx", "txt", "jpg", "jpeg", "png", "gif"];
   const ekstensiArsip = ["zip", "rar", "7z", "tar", "gz"];
 
-  const peringatan = [];
-  let tingkatRisiko = "safe";
-  const alasanRingkas = [];
+  if (hashGagal) {
+    if (tingkatRisiko === "safe") tingkatRisiko = "warn";
+    alasanRingkas.push("SHA-256 tidak dapat dihitung oleh browser untuk file ini");
+    peringatan.push({
+      level: "warn",
+      teks: "Hash SHA-256 tidak tersedia. Pemeriksaan struktur tetap ditampilkan, tetapi hash file tidak dapat digunakan untuk verifikasi tambahan."
+    });
+  }
 
   const adaEkstensiGanda = Boolean(
     ekstensiSebelumnya &&
@@ -108,7 +173,7 @@ async function analisisFile(namaFile, ukuranBytes, tipeMime, arrayBuffer) {
     alasanRingkas.push(`format .exe adalah program aplikasi Windows yang dapat menjalankan perintah sistem secara langsung, namun aman jika diunduh dari situs resmi pengembang terpercaya`);
     peringatan.push({
       level: "warn",
-      teks: "Alasan — Program Aplikasi Windows (.exe): Header biner cocok (Windows PE Executable) dan tidak memakai ekstensi ganda. Jika Anda mengunduhnya dari situs resmi pengembang terpercaya serta Digital Signature-nya valid, file ini aman dipasang. Sebaliknya, jangan jalankan jika dikirim lewat tautan acak."
+      teks: "Alasan — Program Aplikasi Windows (.exe): Header biner terdeteksi sebagai Windows PE dan tidak memakai ekstensi ganda. Ini bukan bukti keamanan atau validitas tanda tangan digital. Verifikasi sumber, penerbit, dan tanda tangan digital melalui antivirus tepercaya sebelum dijalankan."
     });
   }
 
@@ -148,7 +213,13 @@ async function analisisFile(namaFile, ukuranBytes, tipeMime, arrayBuffer) {
   verdictBanner.className = `file-verdict-banner ${tingkatRisiko}`;
   riskBadge.className = "grade-badge";
 
-  if (tingkatRisiko === "danger") {
+  if (eicarTerdeteksi) {
+    verdictTitle.textContent = "TANDA UJI ANTIVIRUS TERDETEKSI";
+    verdictSub.textContent = "Pola EICAR ditemukan. Ini file uji antivirus, bukan bukti malware aktif.";
+    riskBadge.textContent = "EICAR";
+    riskBadge.classList.add("grade-low");
+    reasonNarrative.innerHTML = "<strong>Pola EICAR terdeteksi.</strong> Pola ini dirancang untuk menguji apakah antivirus mengenali tanda uji. Hasil ini tidak membuktikan bahwa file lain yang tidak cocok dengan pola EICAR bebas malware.";
+  } else if (tingkatRisiko === "danger") {
     verdictTitle.textContent = "BERISIKO TINGGI / MENCURIGAKAN";
     verdictSub.textContent = "Ditemukan penyamaran ekstensi/biner atau format skrip berisiko.";
     riskBadge.textContent = "TINGGI";
@@ -156,15 +227,17 @@ async function analisisFile(namaFile, ukuranBytes, tipeMime, arrayBuffer) {
     reasonNarrative.innerHTML = `<strong>Mengapa file ini dinilai Berisiko Tinggi?</strong> Karena ${escapeHtml(alasanRingkas.join("; "))}.`;
   } else if (tingkatRisiko === "warn") {
     verdictTitle.textContent = "PERLU VERIFIKASI SUMBER";
-    verdictSub.textContent = "Tidak ditemukan penyamaran tipe file, namun format ini memiliki kemampuan eksekusi/ekstraksi.";
+    verdictSub.textContent = hashGagal
+      ? "Hash tidak tersedia; pemeriksaan struktur file tetap terbatas."
+      : "Tidak ditemukan penyamaran tipe file, namun format ini memiliki kemampuan eksekusi/ekstraksi.";
     riskBadge.textContent = "VERIFIKASI";
     riskBadge.classList.add("grade-mid");
     reasonNarrative.innerHTML = `<strong>Mengapa statusnya Perlu Verifikasi Sumber?</strong> Karena ${escapeHtml(alasanRingkas.join("; "))}.`;
   } else {
-    verdictTitle.textContent = "AMAN / RISIKO RENDAH";
-    verdictSub.textContent = "Format dokumen atau media standar tanpa tanda penyamaran.";
-    riskBadge.textContent = "AMAN";
-    reasonNarrative.innerHTML = `<strong>Mengapa file ini dinilai Aman (Risiko Rendah)?</strong><br/>1. <strong>Header Biner Cocok:</strong> Tanda tangan biner (<em>magic bytes</em>: <code>${escapeHtml(sig.tipe)}</code>) sesuai dengan ekstensi nama file <code>.${escapeHtml(ekstensiAkhir)}</code>.<br/>2. <strong>Bukan Format Eksekusi:</strong> File ini bukan program aplikasi maupun skrip sistem, serta tidak memakai ekstensi ganda tersembunyi.`;
+    verdictTitle.textContent = "INDIKASI RISIKO RENDAH";
+    verdictSub.textContent = "Tidak ditemukan penyamaran pada pemeriksaan lokal terbatas.";
+    riskBadge.textContent = "RENDAH";
+    reasonNarrative.innerHTML = `<strong>Mengapa indikatornya Risiko Rendah?</strong><br/>1. <strong>Header Biner Cocok:</strong> Tanda tangan biner (<em>magic bytes</em>: <code>${escapeHtml(sig.tipe)}</code>) sesuai dengan ekstensi nama file <code>.${escapeHtml(ekstensiAkhir)}</code>.<br/>2. <strong>Bukan Format Eksekusi:</strong> Tidak ditemukan ekstensi ganda atau format eksekusi dari pemeriksaan lokal. Status ini <strong>bukan hasil antivirus atau bukti file bebas malware</strong>.`;
   }
 
   document.getElementById("fileNameVal").textContent = namaFile;
@@ -172,13 +245,7 @@ async function analisisFile(namaFile, ukuranBytes, tipeMime, arrayBuffer) {
   document.getElementById("fileSignatureVal").textContent = `.${ekstensiAkhir} → ${sig.tipe}`;
   document.getElementById("fileMimeVal").textContent = `MIME Browser: ${tipeMime || "application/octet-stream"}`;
 
-  document.getElementById("fileMd5Val").textContent = md5;
   document.getElementById("fileSha256Val").textContent = sha256;
-  const vtLink = document.getElementById("vtLookupLink");
-  if (/^[a-f0-9]{64}$/i.test(sha256)) {
-    vtLink.href = `https://www.virustotal.com/gui/file/${sha256}`;
-  }
-
   const fileWarningsList = document.getElementById("fileWarningsList");
   fileWarningsList.innerHTML = "";
   if (peringatan.length === 0) {
@@ -200,8 +267,39 @@ async function analisisFile(namaFile, ukuranBytes, tipeMime, arrayBuffer) {
 
 async function prosesFileDariUser(file) {
   if (!file) return;
-  const buffer = await file.arrayBuffer();
-  await analisisFile(file.name, file.size, file.type, buffer);
+  currentFileSha = "";
+  try {
+    const buffer = await file.arrayBuffer();
+    await analisisFile(file.name, file.size, file.type, buffer);
+  } catch (error) {
+    const verdictBanner = document.getElementById("fileVerdictBanner");
+    const verdictTitle = document.getElementById("fileVerdictTitle");
+    const verdictSub = document.getElementById("fileVerdictSubtitle");
+    const riskBadge = document.getElementById("fileRiskBadge");
+    const reasonNarrative = document.getElementById("fileReasonNarrative");
+    const resultArea = document.getElementById("fileResultArea");
+    const warningsList = document.getElementById("fileWarningsList");
+
+    if (resultArea) resultArea.style.display = "block";
+    if (verdictBanner) verdictBanner.className = "file-verdict-banner warn";
+    if (verdictTitle) verdictTitle.textContent = "PEMERIKSAAN GAGAL";
+    if (verdictSub) verdictSub.textContent = "Browser tidak dapat membaca atau memproses file ini.";
+    if (riskBadge) {
+      riskBadge.className = "grade-badge grade-mid";
+      riskBadge.textContent = "TIDAK DIKETAHUI";
+    }
+    if (reasonNarrative) {
+      reasonNarrative.textContent = "Tidak ada kesimpulan keamanan yang dapat diberikan. Ukuran file tidak dibatasi oleh aplikasi, tetapi memori dan kemampuan browser/perangkat tetap menjadi batas teknis. Coba antivirus lokal yang mendukung file besar.";
+    }
+    document.getElementById("fileNameVal").textContent = file.name;
+    document.getElementById("fileSizeVal").textContent = `Ukuran: ${formatUkuranFile(file.size)} (${file.size.toLocaleString("id-ID")} byte)`;
+    document.getElementById("fileSignatureVal").textContent = "Tidak dapat diperiksa";
+    document.getElementById("fileMimeVal").textContent = `MIME Browser: ${file.type || "application/octet-stream"}`;
+    document.getElementById("fileSha256Val").textContent = "-";
+    if (warningsList) warningsList.innerHTML = "";
+    showToast("File gagal diproses. Tidak ada kesimpulan keamanan yang dapat diberikan.");
+    console.error("Gagal memproses file:", error);
+  }
 }
 
 if (fileDropzone && filePickerInput) {
@@ -215,6 +313,7 @@ if (fileDropzone && filePickerInput) {
 
   filePickerInput.addEventListener("change", (e) => {
     if (e.target.files && e.target.files[0]) prosesFileDariUser(e.target.files[0]);
+    filePickerInput.value = "";
   });
 
   fileDropzone.addEventListener("dragover", (e) => {

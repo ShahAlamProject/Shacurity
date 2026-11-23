@@ -7,11 +7,18 @@ const termsOverlay = document.getElementById("termsOverlay");
 const termsCheckbox = document.getElementById("termsCheckbox");
 const termsAcceptBtn = document.getElementById("termsAcceptBtn");
 if (termsOverlay && termsCheckbox && termsAcceptBtn) {
-  const termsAccepted = localStorage.getItem("shacurity-terms-v1") === "accepted";
+  let termsAccepted = false;
+  try {
+    termsAccepted = localStorage.getItem("shacurity-terms-v1") === "accepted";
+  } catch (_) {}
+
   if (termsAccepted) {
     termsOverlay.classList.add("hidden");
+    termsOverlay.setAttribute("aria-hidden", "true");
   } else {
     document.body.style.overflow = "hidden";
+    termsOverlay.setAttribute("aria-hidden", "false");
+    requestAnimationFrame(() => termsCheckbox.focus());
   }
 
   termsCheckbox.addEventListener("change", () => {
@@ -20,9 +27,16 @@ if (termsOverlay && termsCheckbox && termsAcceptBtn) {
 
   termsAcceptBtn.addEventListener("click", () => {
     if (!termsCheckbox.checked) return;
-    localStorage.setItem("shacurity-terms-v1", "accepted");
+    try {
+      localStorage.setItem("shacurity-terms-v1", "accepted");
+    } catch (_) {}
     termsOverlay.classList.add("hidden");
+    termsOverlay.setAttribute("aria-hidden", "true");
     document.body.style.overflow = "";
+  });
+
+  termsOverlay.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") event.preventDefault();
   });
 }
 
@@ -35,17 +49,69 @@ window.addEventListener("scroll", () => {
 const mobileMenuTrigger = document.getElementById("mobileMenuTrigger");
 const mobileSheet = document.getElementById("mobileSheet");
 if (mobileMenuTrigger && mobileSheet) {
+  function tutupMobileSheet() {
+    if (!mobileSheet.classList.contains("open")) return;
+    mobileSheet.classList.remove("open");
+    mobileSheet.classList.add("closing");
+    mobileMenuTrigger.classList.remove("open");
+    mobileMenuTrigger.setAttribute("aria-expanded", "false");
+    mobileMenuTrigger.setAttribute("aria-label", "Buka menu");
+    window.setTimeout(() => {
+      mobileSheet.classList.remove("closing");
+    }, 280);
+  }
+
   mobileMenuTrigger.addEventListener("click", () => {
-    const isOpen = mobileSheet.classList.toggle("open");
+    const isOpen = !mobileSheet.classList.contains("open");
+    if (!isOpen) {
+      tutupMobileSheet();
+      return;
+    }
+    mobileSheet.classList.remove("closing");
+    mobileSheet.classList.add("open");
+    const mobileCtas = mobileSheet.querySelector(".mobile-sheet-ctas");
+    if (mobileCtas && mobileCtas.dataset.userSelected !== "true") {
+      mobileCtas.classList.add("no-selection");
+      mobileCtas.querySelectorAll("[data-mobile-tab]").forEach((button) => button.classList.remove("active"));
+    }
     mobileMenuTrigger.setAttribute("aria-expanded", String(isOpen));
+    mobileMenuTrigger.classList.toggle("open", isOpen);
+    mobileMenuTrigger.setAttribute("aria-label", isOpen ? "Tutup menu" : "Buka menu");
   });
   mobileSheet.querySelectorAll("a").forEach((link) => {
     link.addEventListener("click", () => {
-      if (link.dataset.mobileTab) aktifkanTabLab(link.dataset.mobileTab);
-      mobileSheet.classList.remove("open");
-      mobileMenuTrigger.setAttribute("aria-expanded", "false");
+      if (link.dataset.mobileTab) {
+        aktifkanTabLab(link.dataset.mobileTab);
+        const ctas = link.closest(".mobile-sheet-ctas");
+        if (ctas) {
+          ctas.dataset.userSelected = "true";
+          ctas.classList.remove("no-selection");
+          ctas.querySelectorAll("[data-mobile-tab]").forEach((button) => {
+            button.classList.toggle("active", button === link);
+          });
+        }
+      } else {
+        const ctas = mobileSheet.querySelector(".mobile-sheet-ctas");
+        if (ctas) {
+          ctas.dataset.userSelected = "false";
+          ctas.classList.add("no-selection");
+          ctas.querySelectorAll("[data-mobile-tab]").forEach((button) => button.classList.remove("active"));
+        }
+      }
+      tutupMobileSheet();
     });
   });
+
+  document.addEventListener("click", (event) => {
+    if (!mobileSheet.classList.contains("open")) return;
+    if (navbarWrapper && navbarWrapper.contains(event.target)) return;
+    tutupMobileSheet();
+  });
+
+  window.addEventListener("resize", () => {
+    if (window.innerWidth <= 1024) return;
+    tutupMobileSheet();
+  }, { passive: true });
 }
 
 // 2. Dark / Light Theme Toggle
@@ -72,10 +138,60 @@ function aktifkanTabLab(paneId) {
   document.querySelectorAll(".lab-pane").forEach((pane) => {
     pane.classList.toggle("active", pane.id === paneId);
   });
+
+  requestAnimationFrame(() => {
+    const activeButton = document.querySelector(`.lab-tab-btn[data-lab-tab="${paneId}"]`);
+    const switcher = activeButton ? activeButton.closest(".lab-switcher") : null;
+    if (!activeButton || !switcher) return;
+
+    const switchRect = switcher.getBoundingClientRect();
+    const buttonRect = activeButton.getBoundingClientRect();
+
+    switcher.style.setProperty("--liquid-left", `${buttonRect.left - switchRect.left}px`);
+    switcher.style.setProperty("--liquid-width", `${buttonRect.width}px`);
+    switcher.style.setProperty("--liquid-top", `${buttonRect.top - switchRect.top}px`);
+    switcher.style.setProperty("--liquid-height", `${buttonRect.height}px`);
+  });
+
+  const mobileCtas = document.querySelector(".mobile-sheet-ctas");
+  if (mobileCtas) {
+    const mobileIndexes = {
+      paneRaporDomain: 0,
+      paneCekEmail: 1,
+      paneCekFile: 2
+    };
+    const index = mobileIndexes[paneId] ?? 0;
+    mobileCtas.style.setProperty("--mobile-liquid-index", String(index));
+    if (mobileCtas.dataset.userSelected === "true") {
+      mobileCtas.classList.remove("no-selection");
+      mobileCtas.querySelectorAll("[data-mobile-tab]").forEach((button) => {
+        button.classList.toggle("active", button.dataset.mobileTab === paneId);
+      });
+    }
+  }
 }
 
 document.querySelectorAll(".lab-tab-btn").forEach((btn) => {
   btn.addEventListener("click", () => aktifkanTabLab(btn.dataset.labTab));
+});
+
+requestAnimationFrame(() => {
+  const activeButton = document.querySelector(".lab-tab-btn.active");
+  const switcher = activeButton ? activeButton.closest(".lab-switcher") : null;
+  if (activeButton && switcher) {
+    const switchRect = switcher.getBoundingClientRect();
+    const buttonRect = activeButton.getBoundingClientRect();
+    switcher.style.setProperty("--liquid-left", `${buttonRect.left - switchRect.left}px`);
+    switcher.style.setProperty("--liquid-width", `${buttonRect.width}px`);
+    switcher.style.setProperty("--liquid-top", `${buttonRect.top - switchRect.top}px`);
+    switcher.style.setProperty("--liquid-height", `${buttonRect.height}px`);
+  }
+
+  const mobileCtas = document.querySelector(".mobile-sheet-ctas");
+  if (mobileCtas) {
+    mobileCtas.classList.add("no-selection");
+    mobileCtas.querySelectorAll("[data-mobile-tab]").forEach((button) => button.classList.remove("active"));
+  }
 });
 
 document.querySelectorAll("[data-open-lab]").forEach((el) => {
@@ -230,6 +346,103 @@ if (globeCanvas) {
 // 5. Helper Metadata & Rapor MDN Observatory
 function adalahDomainGoogle(host) {
   return /(^|\.)(google\.[a-z.]+|youtube\.com|youtu\.be|gmail\.com|gstatic\.com|googleapis\.com)$/i.test(host);
+}
+
+function hitungRisikoLinkTerpadu(rawInput, hostname, pslResult, umurHari) {
+  let skor = 0;
+  const temuan = [];
+  let parsed = null;
+
+  try {
+    const teks = String(rawInput || "").trim();
+    parsed = new URL(/^[a-z][a-z0-9+.-]*:\/\//i.test(teks) ? teks : `http://${teks}`);
+  } catch (_) {
+    return { skor: 0, temuan: [] };
+  }
+
+  if (parsed.username || parsed.password || String(rawInput).includes("@")) {
+    skor += 40;
+    temuan.push("Manipulasi karakter @ pada URL");
+  }
+
+  if (/^(\d{1,3}\.){3}\d{1,3}$/.test(hostname) || hostname.includes(":")) {
+    skor += 35;
+    temuan.push("Host menggunakan alamat IP langsung");
+  }
+
+  if (parsed.protocol === "http:") {
+    skor += 15;
+    temuan.push("Koneksi menggunakan HTTP tanpa HTTPS");
+  }
+
+  if (parsed.port && !["80", "443"].includes(parsed.port)) {
+    skor += 15;
+    temuan.push(`Menggunakan port non-standar :${parsed.port}`);
+  }
+
+  if (pslResult.jenisAkhiran === "PRIVATE") {
+    skor += 15;
+    temuan.push(`Akhiran hosting publik/PRIVATE (${pslResult.akhiranPublik})`);
+  }
+
+  const domainDalamSubdomain = deteksiDomainDiSubdomain(pslResult.subdomain);
+  if (domainDalamSubdomain.length > 0) {
+    skor += 35;
+    temuan.push(`Nama domain lain diselipkan di subdomain: ${domainDalamSubdomain.join(", ")}`);
+  }
+
+  if (typeof PHISHING_RULES !== "undefined") {
+    const tld = pslResult.akhiranPublik.split(".").pop();
+    if (PHISHING_RULES.suspiciousTlds.includes(tld)) {
+      skor += 20;
+      temuan.push(`Ekstensi .${tld} sering disalahgunakan`);
+    }
+
+    const gabungan = `${pslResult.subdomain}.${pslResult.labelTerdaftar}`.toLowerCase();
+    PHISHING_RULES.protectedBrands.forEach((brand) => {
+      if (brand.resmi.includes(pslResult.domainUtama)) return;
+      const cocokKata = brand.kata.find((kata) => {
+        const regex = new RegExp(`(^|[.-])${kata.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}([.-]|$)`, "i");
+        return regex.test(gabungan);
+      });
+      if (cocokKata) {
+        skor += 35;
+        temuan.push(`Indikasi penyamaran merek ${brand.nama}`);
+      }
+    });
+
+    const teksUrl = `${hostname}${parsed.pathname}${parsed.search}`.toLowerCase();
+    const kataUmpan = PHISHING_RULES.urgencyKeywords.filter((kata) => teksUrl.includes(kata));
+    if (kataUmpan.length > 0) {
+      skor += kataUmpan.length >= 2 ? 20 : 10;
+      temuan.push(`Kata umpan sensitif: ${kataUmpan.slice(0, 4).join(", ")}`);
+    }
+  }
+
+  if (hostname.includes("xn--")) {
+    skor += 30;
+    temuan.push("Domain Punycode/homograph (xn--)");
+  }
+
+  if (pslResult.subdomainLabels.length >= 3) {
+    skor += 15;
+    temuan.push(`Subdomain terlalu bertingkat (${pslResult.subdomainLabels.length} tingkat)`);
+  }
+
+  if (umurHari !== null && umurHari < 30) {
+    skor += 30;
+    temuan.push(`Domain sangat baru (${umurHari} hari)`);
+  } else if (umurHari !== null && umurHari < 180) {
+    skor += 15;
+    temuan.push(`Domain relatif baru (${umurHari} hari)`);
+  }
+
+  if (parsed.href.length > 105) {
+    skor += 10;
+    temuan.push("URL sangat panjang");
+  }
+
+  return { skor: Math.min(100, skor), temuan: [...new Set(temuan)] };
 }
 
 function keteranganNilai(grade) {
@@ -588,6 +801,46 @@ async function jalankanPemeriksaanTerpadu(inputMentah, paksaSegar = false) {
   }
   renderDaftarWaspada(daftarWaspadaLengkap);
 
+  const risikoLink = hitungRisikoLinkTerpadu(inputMentah, hostname, pslResult, umurHari);
+  const riskSummary = document.getElementById("unifiedRiskSummary");
+  const riskTitle = document.getElementById("unifiedRiskTitle");
+  const riskText = document.getElementById("unifiedRiskText");
+  const riskBadge = document.getElementById("unifiedRiskBadge");
+  const riskMeter = document.getElementById("unifiedRiskMeter");
+
+  if (riskSummary) {
+    riskSummary.style.display = "grid";
+    let kelas = "TIDAK ADA INDIKATOR KUAT";
+    let deskripsi = "Pemeriksaan heuristik lokal tidak menemukan indikator kuat penyamaran atau manipulasi tautan.";
+    let warna = "var(--green)";
+    let badgeClass = "";
+
+    if (risikoLink.skor >= 55) {
+      kelas = "TERINDIKASI PHISHING / BERISIKO TINGGI";
+      deskripsi = "Ditemukan pola penipuan atau penyamaran domain. Jangan memasukkan kredensial atau OTP.";
+      warna = "var(--red)";
+      badgeClass = "grade-low";
+    } else if (risikoLink.skor >= 25) {
+      kelas = "PERLU WASPADA";
+      deskripsi = "Tautan memiliki beberapa karakteristik yang perlu diverifikasi sebelum dibuka.";
+      warna = "var(--amber)";
+      badgeClass = "grade-mid";
+    }
+
+    if (risikoLink.temuan.length > 0) {
+      deskripsi += ` Temuan utama: ${risikoLink.temuan.slice(0, 3).join("; ")}.`;
+    }
+
+    riskTitle.textContent = kelas;
+    riskText.textContent = deskripsi;
+    riskBadge.textContent = `RISIKO ${risikoLink.skor}/100`;
+    riskBadge.className = `grade-badge ${badgeClass}`.trim();
+    if (riskMeter) {
+      riskMeter.style.width = `${Math.max(6, risikoLink.skor)}%`;
+      riskMeter.style.backgroundColor = warna;
+    }
+  }
+
   // Render Rapor MDN Observatory
   const obsNoticeBox = document.getElementById("obsNoticeBox");
   const obsMetricsWrapper = document.getElementById("obsMetricsWrapper");
@@ -734,10 +987,20 @@ if (toggleJsonBtn) {
 // 7. FAQ Accordion
 document.querySelectorAll(".faq-btn").forEach((btn) => {
   btn.addEventListener("click", () => {
-    const item = btn.parentElement;
+    const item = btn.closest(".faq-item");
     const wasOpen = item.classList.contains("open");
-    document.querySelectorAll(".faq-item").forEach((el) => el.classList.remove("open"));
-    if (!wasOpen) item.classList.add("open");
+    document.querySelectorAll(".faq-item").forEach((el) => {
+      el.classList.remove("open");
+      const question = el.querySelector(".faq-btn");
+      const answer = el.querySelector(".faq-body");
+      question.setAttribute("aria-expanded", "false");
+      answer.setAttribute("aria-hidden", "true");
+    });
+    if (!wasOpen) {
+      item.classList.add("open");
+      btn.setAttribute("aria-expanded", "true");
+      item.querySelector(".faq-body").setAttribute("aria-hidden", "false");
+    }
   });
 });
 
