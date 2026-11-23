@@ -2,6 +2,30 @@
    APP.JS — Pengendali UI, Tema, Animasi Visual & Integrasi API RDAP/DNS/MDN
    ========================================================================== */
 
+// 0. Terms and Conditions Gate
+const termsOverlay = document.getElementById("termsOverlay");
+const termsCheckbox = document.getElementById("termsCheckbox");
+const termsAcceptBtn = document.getElementById("termsAcceptBtn");
+if (termsOverlay && termsCheckbox && termsAcceptBtn) {
+  const termsAccepted = localStorage.getItem("shacurity-terms-v1") === "accepted";
+  if (termsAccepted) {
+    termsOverlay.classList.add("hidden");
+  } else {
+    document.body.style.overflow = "hidden";
+  }
+
+  termsCheckbox.addEventListener("change", () => {
+    termsAcceptBtn.disabled = !termsCheckbox.checked;
+  });
+
+  termsAcceptBtn.addEventListener("click", () => {
+    if (!termsCheckbox.checked) return;
+    localStorage.setItem("shacurity-terms-v1", "accepted");
+    termsOverlay.classList.add("hidden");
+    document.body.style.overflow = "";
+  });
+}
+
 // 1. Navbar Scroll & Mobile Sheet
 const navbarWrapper = document.getElementById("navbarWrapper");
 window.addEventListener("scroll", () => {

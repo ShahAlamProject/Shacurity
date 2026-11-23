@@ -1685,6 +1685,84 @@ code {
 .toast-msg.show { transform: translateY(0); opacity: 1; }
 
 /* ==========================================================================
+   TERMS AND CONDITIONS GATE
+   ========================================================================== */
+.terms-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: max(16px, var(--safe-top)) max(16px, var(--safe-right)) max(16px, var(--safe-bottom)) max(16px, var(--safe-left));
+  background: rgba(0, 0, 0, 0.78);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+.terms-overlay.hidden { display: none; }
+.terms-modal {
+  width: min(560px, 100%);
+  max-height: calc(100vh - 32px - var(--safe-top) - var(--safe-bottom));
+  overflow: auto;
+  padding: clamp(20px, 5vw, 32px);
+  border: 1px solid var(--border-strong);
+  border-radius: 24px;
+  background: var(--surface-card);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.5);
+}
+.terms-icon {
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 18px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface-elevated);
+  color: var(--green);
+}
+.terms-icon svg { width: 24px; height: 24px; }
+.terms-heading h2 {
+  margin-top: 6px;
+  font-size: clamp(24px, 6vw, 34px);
+  line-height: 1.15;
+  letter-spacing: -0.04em;
+}
+.terms-heading .eyebrow { color: var(--green); }
+.terms-scroll {
+  max-height: 280px;
+  overflow-y: auto;
+  margin: 18px 0;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface);
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1.7;
+  scrollbar-width: thin;
+}
+.terms-scroll ul { margin: 10px 0 10px 18px; }
+.terms-scroll li + li { margin-top: 8px; }
+.terms-scroll strong { color: var(--text-primary); }
+.terms-agreement {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 16px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  cursor: pointer;
+}
+.terms-agreement input {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+  margin-top: 2px;
+  accent-color: var(--green);
+}
+.terms-accept { width: 100%; }
+
+/* ==========================================================================
    9. MULTI-GADGET & FOLDABLE MEDIA QUERIES
    ========================================================================== */
 @media (horizontal-viewport-segments: 2) {
@@ -1756,6 +1834,5 @@ code {
 }
 
 @media (hover: none) {
-  .f-card:hover,
   .social-link:hover { transform: none; }
 }
