@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Shacurity — DomainUtama (PSL), Rapor Website, Deteksi Link Phishing &amp; Cek File</title>
-  <link rel="stylesheet" href="css/style.css?v=20261123-2301" />
+  <title>Shacurity — Pemeriksaan Domain, Email &amp; File</title>
+  <link id="favicon" rel="icon" type="image/png" href="logohpdarkmode.png" />
+  <link rel="stylesheet" href="css/style.css?v=20261124-2318" />
 </head>
 <body>
 
@@ -24,9 +25,9 @@
       <div class="terms-scroll" id="termsDescription" tabindex="0">
         <p>Dengan menggunakan Shacurity, Anda menyetujui ketentuan berikut:</p>
         <ul>
-          <li><strong>Tujuan edukasi.</strong> Shacurity membantu pemeriksaan struktur domain, tautan phishing, konfigurasi web, dan jenis berkas. Hasilnya bukan jaminan bahwa situs atau berkas sepenuhnya aman.</li>
+          <li><strong>Tujuan edukasi.</strong> Shacurity membantu memeriksa domain, tautan, email, dan berkas. Hasilnya bukan jaminan aman atau bukti ancaman.</li>
           <li><strong>Keputusan pengguna.</strong> Anda bertanggung jawab atas keputusan keamanan, transaksi, unduhan, dan tindakan lanjutan setelah melihat hasil.</li>
-          <li><strong>Pemrosesan lokal.</strong> Pemeriksaan file dilakukan pada perangkat Anda. Alamat domain atau permintaan API tertentu dapat dikirim ke layanan eksternal untuk memperoleh hasil analisis.</li>
+          <li><strong>Privasi.</strong> Cek Domain &amp; Link mengirim host/domain ke DNS publik, RDAP, SecurityHeaders.com, dan CertSpotter untuk mengambil hasil online. URL lengkap, alamat email, dan file tidak dikirim oleh fitur tersebut; email dan file diperiksa lokal.</li>
           <li><strong>Data sementara.</strong> Situs dapat menyimpan preferensi tema dan status persetujuan ini pada browser Anda melalui penyimpanan lokal.</li>
           <li><strong>Tidak ada jaminan.</strong> Informasi dan hasil dapat berubah, tidak lengkap, atau mengandung hasil positif maupun negatif yang keliru.</li>
         </ul>
@@ -50,6 +51,8 @@
       <a href="#" class="nav-brand" aria-label="Shacurity Home">
         <img src="logodarkmode.png" class="nav-brand-logo logo-dark" alt="Shacurity" />
         <img src="logolightmode.png" class="nav-brand-logo logo-light" alt="Shacurity" />
+        <img src="logohpdarkmode.png" class="nav-brand-logo logo-mobile-dark" alt="" />
+        <img src="logohplightmode.png" class="nav-brand-logo logo-mobile-light" alt="" />
       </a>
 
       <nav class="nav-center" aria-label="Navigasi Utama">
@@ -124,7 +127,7 @@
   </button>
 
   <!-- ========================================================================
-       HERO (DOMAINUTAMA PSL, RAPOR WEBSITE, DETEKSI PHISHING & CEK FILE)
+       HERO (PEMERIKSAAN KEAMANAN LOKAL)
        ======================================================================== -->
   <main>
     <section class="hero">
@@ -135,13 +138,13 @@
         <div class="hero-content">
           <div class="eyebrow">
             <span class="pulse-dot"></span>
-            <span>Literasi Struktur Domain (Public Suffix List), Deteksi Phishing &amp; Cek File</span>
+            <span>Literasi Keamanan Digital • Pemeriksaan Online &amp; Lokal</span>
           </div>
           <h1 class="hero-title">
-            <span>Pecah Struktur Domain, Deteksi Phishing &amp; Keamanan File.</span>
+            <span>Periksa Domain, Link, Email &amp; File.</span>
           </h1>
           <p class="hero-desc">
-            Pahami batas antara subdomain, domain utama (domain terdaftar), dan akhiran publik (ICANN &amp; PRIVATE) memakai aturan Public Suffix List, lengkap dengan rapor konfigurasi HTTP, deteksi tautan phishing, serta analisis biner file lokal.
+            Periksa pola tautan, DNS, pendaftaran domain, konfigurasi HTTP, dan riwayat sertifikat. Email dan file tetap diperiksa langsung di perangkat Anda.
           </p>
           <div class="hero-ctas">
             <a href="#lab-keamanan" class="btn btn-primary">Buka Lab Keamanan &rarr;</a>
@@ -152,15 +155,15 @@
     </section>
 
     <!-- ======================================================================
-         FITUR UTAMA (3 KARTU TERHUBUNG LANGSUNG KE LAB KEAMANAN)
+         FITUR UTAMA (MODUL LOKAL DAN BATAS PEMERIKSAAN)
          ====================================================================== -->
     <section class="section border-top" id="features">
       <div class="container">
         <div class="section-header">
           <div class="eyebrow">Fitur Utama</div>
-          <h2 class="section-title">Tiga Modul Verifikasi Domain, Link, File &amp; Email</h2>
+          <h2 class="section-title">Tiga Modul Pemeriksaan Keamanan</h2>
           <p class="section-subtitle">
-            Dirancang untuk memeriksa domain dan tautan, keamanan file, serta konfigurasi dasar alamat email dari satu lab terintegrasi.
+            Cek Domain &amp; Link menggunakan data online; pemeriksaan email dan file tetap lokal.
           </p>
         </div>
 
@@ -183,15 +186,15 @@
               </div>
 
               <div class="perf-preview-bar">
-                <span style="font-family:var(--font-mono);color:var(--text-primary);">HTTP Observatory</span>
-                <span style="color:var(--green);font-size:11px;">Rapor Header &amp; TLS</span>
+                <span style="font-family:var(--font-mono);color:var(--text-primary);">SecurityHeaders.com</span>
+                <span style="color:var(--green);font-size:11px;">Rapor Konfigurasi Web</span>
               </div>
             </div>
 
             <div class="f-card-footer">
               <div>
                 <h3>Cek Domain &amp; Link</h3>
-                <p>Pecah nama domain memakai PSL, analisis indikator phishing tautan, cek RDAP/DNS, dan tampilkan rapor konfigurasi HTTP.</p>
+                <p>Uraikan domain, periksa DNS dan data pendaftaran, serta tampilkan rapor konfigurasi HTTP dan riwayat sertifikat.</p>
               </div>
               <button type="button" class="f-launch-btn" data-open-lab="paneRaporDomain">
                 Buka Cek Domain &amp; Link &rarr;
@@ -230,28 +233,28 @@
             <div class="f-visual">
               <div>
                 <div style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;margin-bottom:6px;">
-                  Validasi Email &amp; DNS
+                  Validasi Email &amp; Domain Lokal
                 </div>
                 <div class="domain-demo-bar">
                   <span style="color:var(--blue);font-weight:700;">nama</span>@<span style="color:var(--green);font-weight:700;">contoh.ac.id</span>
                 </div>
                 <div class="domain-demo-badges">
                   <span class="mini-tag">Format Email</span>
-                  <span class="mini-tag warn">MX &amp; SPF</span>
-                  <span class="mini-tag">DMARC</span>
+                  <span class="mini-tag warn">Daftar Terbatas</span>
+                  <span class="mini-tag">Tanpa DNS</span>
                 </div>
               </div>
 
               <div class="perf-preview-bar">
-                <span style="font-family:var(--font-mono);color:var(--text-primary);">DNS Publik Google</span>
-                <span style="color:var(--green);font-size:11px;">Tanpa Login Akun</span>
+                <span style="font-family:var(--font-mono);color:var(--text-primary);">Pemeriksaan Lokal</span>
+                <span style="color:var(--green);font-size:11px;">Tanpa API</span>
               </div>
             </div>
 
             <div class="f-card-footer">
               <div>
                 <h3>Cek Email</h3>
-                <p>Validasi format alamat, klasifikasi domain, pemeriksaan MX/SPF/DMARC, serta indikator penyamaran merek atau domain sementara.</p>
+                <p>Validasi format dan bandingkan domain dengan daftar email sekali pakai lokal yang terbatas. DNS dan keberadaan kotak masuk tidak diperiksa.</p>
               </div>
               <button type="button" class="f-launch-btn" data-open-lab="paneCekEmail">
                 Buka Cek Email &rarr;
@@ -275,9 +278,9 @@
             <span class="pulse-dot"></span>
             <span>Lab Keamanan &amp; Literasi Digital</span>
           </div>
-          <h2 class="section-title">DomainUtama (PSL), Deteksi Phishing &amp; Cek File</h2>
+          <h2 class="section-title">Cek Domain &amp; Link, Email, dan File</h2>
           <p class="section-subtitle">
-            Pecah struktur domain memakai Public Suffix List (ICANN &amp; PRIVATE), deteksi tautan phishing sebelum diklik, dan periksa biner file secara lokal.
+            Pemeriksaan domain memerlukan koneksi internet. Hasil indikator bukan bukti phishing atau jaminan file aman.
           </p>
         </div>
 
@@ -355,6 +358,10 @@
                 </div>
               </div>
 
+              <div class="online-privacy-note" role="note">
+                Pemeriksaan domain memakai layanan online. Host dikirim ke DNS/SecurityHeaders.com; domain utama dikirim ke RDAP/CertSpotter. URL path, alamat email, dan file tidak dikirim.
+              </div>
+
               <form class="cek-search-form" id="unifiedForm" novalidate>
                 <div class="cek-input-wrap">
                   <span class="cek-input-icon" aria-hidden="true">
@@ -395,23 +402,20 @@
               <div class="psl-control-bar psl-control-bar-compact">
                 <div class="psl-info-group">
                   <span style="font-weight:600;color:var(--text-primary);">Basis PSL:</span>
-                  <span class="psl-count-badge" id="pslStatusBadge">Daftar Ringkas Bawaan (19 aturan)</span>
-                  <span id="pslSourceNote" style="font-size:12px;">Sumber: publicsuffix.org (MPL-2.0)</span>
+                  <span class="psl-count-badge" id="pslStatusBadge">Daftar lokal ringkas</span>
+                  <span id="pslSourceNote" style="font-size:12px;">Tidak ada koneksi jaringan</span>
                 </div>
-                <button type="button" class="btn btn-secondary" id="loadFullPslBtn" style="min-height:36px;padding:6px 14px;font-size:12.5px;">
-                  <span id="loadFullPslLabel">Muat PSL Lengkap</span>
-                </button>
               </div>
               <p class="psl-help-text">
                 PSL (Public Suffix List) membantu mengenali akhiran domain publik, seperti <code>.co.uk</code> atau <code>.ac.id</code>,
-                agar pemeriksa dapat membedakan domain utama dari subdomain. Daftar lengkap memerlukan koneksi internet; daftar ringkas bawaan tetap digunakan jika tidak dimuat.
+                agar pemeriksa dapat membedakan domain utama dari subdomain. Cakupan PSL lokal terbatas; hasil fallback ditandai dan perlu diverifikasi.
               </p>
 
               <div class="cek-status-banner" id="statusBanner" role="status" aria-live="polite"></div>
 
               <div class="unified-risk-summary" id="unifiedRiskSummary" style="display:none;">
                 <div class="unified-risk-score">
-                  <span class="cek-card-label">Risiko Link / Phishing</span>
+                  <span class="cek-card-label">Indikator Link Lokal</span>
                   <strong id="unifiedRiskTitle">-</strong>
                   <span id="unifiedRiskText" class="unified-risk-text">Belum diperiksa</span>
                 </div>
@@ -482,67 +486,64 @@
                 </div>
 
                 <div class="group-heading">
-                  <span>2. Informasi Pendaftaran RDAP &amp; DNS Publik</span>
-                  <span style="font-family:var(--font-mono);font-size:11.5px;text-transform:none;color:var(--text-muted);">Query Metadata Domain</span>
+                  <span>2. Hasil Pemeriksaan Online</span>
+                  <span style="font-family:var(--font-mono);font-size:11.5px;text-transform:none;color:var(--text-muted);">DNS • RDAP • HTTP • Sertifikat</span>
                 </div>
 
-                <div class="cek-results-grid">
+                <div class="cek-results-grid online-checks-grid">
                   <div class="cek-card">
                     <div class="cek-card-label">Alamat IP (DNS A)</div>
-                    <div class="cek-card-value" id="resIpAddress">-</div>
+                    <div class="cek-card-value" id="resIpAddress">Menunggu pemeriksaan</div>
                     <div class="cek-card-note" id="resIpHost">-</div>
+                    <div class="cek-card-note online-status" id="dnsStatus" role="status" aria-live="polite">Belum dimulai</div>
                   </div>
-
                   <div class="cek-card">
-                    <div class="cek-card-label">Tanggal Daftar &amp; Masa Berlaku (RDAP)</div>
-                    <div class="cek-card-value" id="resRegDate">-</div>
+                    <div class="cek-card-label">Pendaftaran &amp; Masa Berlaku (RDAP)</div>
+                    <div class="cek-card-value" id="resRegDate">Menunggu pemeriksaan</div>
                     <div class="cek-card-note" id="resDomainAge">-</div>
+                    <div class="cek-card-note online-status" id="rdapStatus" role="status" aria-live="polite">Belum dimulai</div>
+                  </div>
+                  <div class="cek-card">
+                    <div class="cek-card-label">Rapor Header HTTP (SecurityHeaders.com)</div>
+                    <div class="cek-card-value" style="display:flex;align-items:center;gap:8px;">
+                      <span class="grade-badge" id="raporGrade">-</span>
+                      <span id="raporScore">Laporan online</span>
+                    </div>
+                    <div class="cek-card-note" id="raporPassed">-</div>
+                    <div class="cek-card-note online-status" id="obsStatusTag" role="status" aria-live="polite">Belum dimulai</div>
+                    <div class="cek-card-note" id="obsNoticeBox" style="display:none;"></div>
                   </div>
                 </div>
 
                 <div class="group-heading">
-                  <span>3. Rapor Keamanan HTTP (MDN Observatory)</span>
-                  <span id="obsStatusTag" style="font-family:var(--font-mono);font-size:11.5px;text-transform:none;"></span>
+                  <span>3. Riwayat Sertifikat (CertSpotter)</span>
+                  <span id="certHistoryTarget" style="font-family:var(--font-mono);font-size:11.5px;text-transform:none;color:var(--text-muted);"></span>
                 </div>
 
-                <div id="obsNoticeBox" class="obs-notice" style="display:none;"></div>
-
-                <div id="obsMetricsWrapper">
-                  <div class="rapor-metrics-grid">
-                    <div class="cek-card">
-                      <div class="cek-card-label">Nilai (Grade)</div>
-                      <div style="display:flex;align-items:center;gap:10px;">
-                        <span class="grade-badge" id="raporGrade">-</span>
-                        <span class="cek-card-note" id="raporGradeDesc" style="margin-top:0;">-</span>
-                      </div>
-                    </div>
-
-                    <div class="cek-card">
-                      <div class="cek-card-label">Skor Keamanan</div>
-                      <div class="cek-card-value" id="raporScore">-</div>
-                      <div class="cek-card-note">Poin MDN Observatory</div>
-                    </div>
-
-                    <div class="cek-card">
-                      <div class="cek-card-label">Jumlah Tes Lolos</div>
-                      <div class="cek-card-value" id="raporPassed">-</div>
-                      <div class="cek-card-note" id="raporPassedPct">-</div>
-                    </div>
-
-                    <div class="cek-card">
-                      <div class="cek-card-label">Tanggal Pemindaian</div>
-                      <div class="cek-card-value" id="raporDate" style="font-size:0.95rem;">-</div>
-                      <div class="cek-card-note" id="raporAlgo">-</div>
-                    </div>
-                  </div>
-
+                <div class="cek-results-grid cert-history-summary">
                   <div class="cek-card">
-                    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
-                      <div class="cek-card-label" style="margin-bottom:0;">Daftar Tes Pemeriksaan Keamanan HTTP</div>
-                      <span style="font-family:var(--font-mono);font-size:11.5px;color:var(--text-muted);" id="raporTestSummary"></span>
-                    </div>
-                    <div class="obs-tests-list" id="raporTestsList"></div>
+                    <div class="cek-card-label">Sertifikat Ditemukan</div>
+                    <div class="cek-card-value" id="certHistoryCount">-</div>
                   </div>
+                  <div class="cek-card">
+                    <div class="cek-card-label">Penerbit Terbanyak</div>
+                    <div class="cek-card-value" id="certHistoryTopIssuer">-</div>
+                  </div>
+                </div>
+
+                <div class="cek-status-banner" id="certHistoryStatus" role="status" aria-live="polite"></div>
+                <p class="cek-card-note">Riwayat sertifikat adalah catatan publik dan bukan bukti situs aman maupun berbahaya.</p>
+                <div class="cert-history-table-wrap">
+                  <table class="cert-history-table">
+                    <thead>
+                      <tr>
+                        <th scope="col">Nama Sertifikat</th>
+                        <th scope="col">Penerbit</th>
+                        <th scope="col">Tanggal Berakhir</th>
+                      </tr>
+                    </thead>
+                    <tbody id="certHistoryTableBody"></tbody>
+                  </table>
                 </div>
 
                 <div class="cek-actions-bar">
@@ -614,7 +615,7 @@
                 <button type="button" class="example-chip" data-file-sim="spoofed-pdf">KHS_Mahasiswa.pdf.exe (Penyamaran)</button>
                 <button type="button" class="example-chip" data-file-sim="trusted-exe">Installer_Resmi_App.exe (Program Eksekusi)</button>
                 <button type="button" class="example-chip" data-file-sim="apk-undangan">Undangan_Resmi.apk (Berisiko Tinggi)</button>
-                <button type="button" class="example-chip" data-file-sim="safe-pdf">Panduan_Akademik.pdf (Risiko Rendah)</button>
+                <button type="button" class="example-chip" data-file-sim="safe-pdf">Panduan_Akademik.pdf (pola lokal)</button>
               </div>
 
               <div id="fileResultArea" style="display:none;">
@@ -686,7 +687,7 @@
                   </svg>
                 </span>
                 <div>
-                  <strong>Pemeriksaan Email Aman:</strong> Validasi format dilakukan di browser. Pemeriksaan MX, SPF, dan DMARC memakai DNS publik Google. Alamat email tidak dikirim ke server pengirim atau dicoba login.
+                  <strong>Pemeriksaan Email Lokal:</strong> Alamat diproses di browser dan tidak dikirim atau disimpan. Daftar email sekali pakai tertanam di halaman, terbatas, dan tidak diperbarui otomatis.
                 </div>
               </div>
 
@@ -703,7 +704,7 @@
                     id="emailInput"
                     class="cek-input"
                     placeholder="Masukkan alamat email, misal: admin@contoh.ac.id"
-                    autocomplete="email"
+                    autocomplete="off"
                     spellcheck="false"
                     aria-label="Alamat email untuk diperiksa"
                     required
@@ -739,19 +740,20 @@
                     <div class="cek-card-note" id="emailDomainValue">-</div>
                   </div>
                   <div class="cek-card">
-                    <div class="cek-card-label">Klasifikasi Domain</div>
+                    <div class="cek-card-label">Status Domain Email Sekali Pakai</div>
                     <div class="cek-card-value" id="emailDomainType">-</div>
                     <div class="cek-card-note" id="emailDomainNote">-</div>
+                    <div class="cek-card-note">Jumlah domain dalam daftar: <strong id="emailDisposableListCount">-</strong></div>
                   </div>
                   <div class="cek-card full-span">
-                    <div class="cek-card-label">Indikator DNS Email</div>
+                    <div class="cek-card-label">Indikator Lokal</div>
                     <ul class="warning-list" id="emailIndicatorsList"></ul>
                   </div>
                 </div>
               </div>
 
               <div class="cek-disclaimer">
-                <strong>Batas Pemeriksaan:</strong> Format dan DNS tidak membuktikan kepemilikan kotak masuk, identitas pengirim, atau keaslian pesan sebelumnya. SPF/DMARC perlu dipahami bersama header email lengkap.
+                <strong>Batas Pemeriksaan:</strong> Daftar terbatas; domain yang tidak tercantum bukan berarti aman. Pemeriksaan format tidak membuktikan kotak masuk ada, siapa pengirimnya, atau keaslian pesan.
               </div>
             </div>
           </div>
@@ -796,7 +798,7 @@
               <span class="faq-symbol">+</span>
             </button>
             <div class="faq-body" id="faqAnswer3" role="region" aria-labelledby="faqQuestion3" aria-hidden="true">
-              File tidak diunggah; pemeriksaannya berjalan di perangkat Anda. Browser Shacurity tidak menavigasi ke situs yang diperiksa, tetapi cek domain/email mengirim nama domain ke layanan DNS Google dan RDAP. Rapor HTTP juga meminta layanan MDN Observatory memindai host tersebut.
+              File dan email diperiksa di perangkat Anda. Cek Domain &amp; Link mengirim host/domain ke DNS publik, RDAP, SecurityHeaders.com, dan CertSpotter; aplikasi tidak membuka situs tujuan. URL path, email, dan file tidak dikirim.
             </div>
           </div>
 
@@ -806,7 +808,7 @@
               <span class="faq-symbol">+</span>
             </button>
             <div class="faq-body" id="faqAnswer4" role="region" aria-labelledby="faqQuestion4" aria-hidden="true">
-              Tidak. Pemeriksaan domain dan email memakai heuristik serta data DNS/RDAP yang tersedia, sedangkan pemeriksaan file mencocokkan struktur, pola uji EICAR, dan SHA-256. Ini bukan pemindaian antivirus atau jaminan bebas ancaman. Verifikasi melalui saluran resmi dan gunakan antivirus tepercaya untuk memindai file.
+              Tidak. Domain memakai heuristik lokal serta data DNS/RDAP/HTTP/sertifikat yang tersedia; email memakai pola lokal terbatas; file diperiksa melalui struktur, pola uji EICAR, dan SHA-256. Ini bukan pemindaian antivirus atau jaminan bebas ancaman.
             </div>
           </div>
 
@@ -816,7 +818,7 @@
               <span class="faq-symbol">+</span>
             </button>
             <div class="faq-body" id="faqAnswer5" role="region" aria-labelledby="faqQuestion5" aria-hidden="true">
-              PSL membantu mengenali batas akhiran publik—misalnya <code>.co.uk</code>—agar alat dapat membedakan domain utama dari subdomain. Daftar ringkas tersedia secara lokal; tombol “Muat PSL Lengkap” mengambil daftar terbaru melalui internet.
+              PSL membantu mengenali batas akhiran publik—misalnya <code>.co.uk</code>—agar alat dapat membedakan domain utama dari subdomain. Aplikasi memakai daftar lokal ringkas; akhiran yang tidak dikenal menggunakan fallback dan hasilnya perlu diverifikasi.
             </div>
           </div>
         </div>
@@ -836,7 +838,7 @@
             <img src="logolightmode.png" class="nav-brand-logo logo-light" alt="Shacurity" />
           </a>
           <p style="font-size:14px;color:var(--text-secondary);max-width:360px;">
-            Alat bantu literasi keamanan web untuk memecah struktur domain (Public Suffix List), mendeteksi link phishing, membaca rapor konfigurasi HTTP, serta memeriksa keamanan file secara lokal.
+            Alat bantu literasi keamanan web untuk memeriksa domain dan tautan melalui layanan publik serta memeriksa email dan file secara lokal.
           </p>
 
           <div class="footer-socials" aria-label="Media Sosial Shacurity">
@@ -877,8 +879,8 @@
         <div>
           <div class="footer-col-title">Alat Pemeriksaan</div>
           <ul class="footer-list">
-            <li><a href="#features">Tiga Modul Utama</a></li>
-            <li><a href="#lab-keamanan" data-open-lab="paneRaporDomain">DomainUtama (PSL) &amp; Rapor</a></li>
+            <li><a href="#features">Fitur Pemeriksaan</a></li>
+            <li><a href="#lab-keamanan" data-open-lab="paneRaporDomain">Struktur Domain &amp; Link</a></li>
             <li><a href="#lab-keamanan" data-open-lab="paneRaporDomain">Cek Domain &amp; Risiko Link</a></li>
             <li><a href="#lab-keamanan" data-open-lab="paneCekFile">Cek Keamanan File</a></li>
             <li><a href="#lab-keamanan" data-open-lab="paneCekEmail">Cek Email</a></li>
@@ -890,8 +892,9 @@
           <div class="footer-col-title">Referensi Standar</div>
           <ul class="footer-list">
             <li><a href="https://publicsuffix.org/" target="_blank" rel="noopener noreferrer">Public Suffix List (MPL-2.0)</a></li>
-            <li><a href="https://developer.mozilla.org/en-US/observatory" target="_blank" rel="noopener noreferrer">MDN HTTP Observatory</a></li>
+            <li><a href="https://securityheaders.com/" target="_blank" rel="noopener noreferrer">SecurityHeaders.com</a></li>
             <li><a href="https://about.rdap.org/" target="_blank" rel="noopener noreferrer">RDAP Registration Data</a></li>
+            <li><a href="https://sslmate.com/certspotter/" target="_blank" rel="noopener noreferrer">CertSpotter</a></li>
           </ul>
         </div>
       </div>
@@ -922,7 +925,7 @@
 
       <div class="footer-bottom">
         <span>&copy; 2026 Shacurity by ShahAlamProject. Public Suffix List data &copy; Mozilla &amp; kontributor (MPL-2.0).</span>
-        <span>Client-Side Privacy &bull; Web, Phishing &amp; File Security Literacy.</span>
+        <span>Domain &amp; Link Online • Email &amp; File Lokal.</span>
       </div>
     </div>
   </footer>
@@ -933,8 +936,7 @@
   <script src="js/utils.js"></script>
   <script src="js/psl.js"></script>
   <script src="js/file-checker.js"></script>
-  <script src="js/phishing-checker.js"></script>
   <script src="js/email-checker.js"></script>
-  <script src="js/app.js"></script>
+  <script src="js/app.js?v=20261124-2318"></script>
 </body>
 </html>

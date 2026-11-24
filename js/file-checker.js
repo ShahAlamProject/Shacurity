@@ -218,26 +218,24 @@ async function analisisFile(namaFile, ukuranBytes, tipeMime, arrayBuffer) {
     verdictSub.textContent = "Pola EICAR ditemukan. Ini file uji antivirus, bukan bukti malware aktif.";
     riskBadge.textContent = "EICAR";
     riskBadge.classList.add("grade-low");
-    reasonNarrative.innerHTML = "<strong>Pola EICAR terdeteksi.</strong> Pola ini dirancang untuk menguji apakah antivirus mengenali tanda uji. Hasil ini tidak membuktikan bahwa file lain yang tidak cocok dengan pola EICAR bebas malware.";
+    reasonNarrative.textContent = "Pola EICAR ditemukan; ini bukan deteksi malware aktif.";
   } else if (tingkatRisiko === "danger") {
-    verdictTitle.textContent = "BERISIKO TINGGI / MENCURIGAKAN";
-    verdictSub.textContent = "Ditemukan penyamaran ekstensi/biner atau format skrip berisiko.";
+    verdictTitle.textContent = "POLA FILE BERISIKO TERDETEKSI";
+    verdictSub.textContent = "Periksa ekstensi, tipe file, dan sumber sebelum membuka.";
     riskBadge.textContent = "TINGGI";
     riskBadge.classList.add("grade-low");
-    reasonNarrative.innerHTML = `<strong>Mengapa file ini dinilai Berisiko Tinggi?</strong> Karena ${escapeHtml(alasanRingkas.join("; "))}.`;
+    reasonNarrative.textContent = `Indikator: ${alasanRingkas.slice(0, 2).join("; ")}. Ini bukan pemindaian antivirus.`;
   } else if (tingkatRisiko === "warn") {
-    verdictTitle.textContent = "PERLU VERIFIKASI SUMBER";
-    verdictSub.textContent = hashGagal
-      ? "Hash tidak tersedia; pemeriksaan struktur file tetap terbatas."
-      : "Tidak ditemukan penyamaran tipe file, namun format ini memiliki kemampuan eksekusi/ekstraksi.";
+    verdictTitle.textContent = "PERLU DIPERIKSA";
+    verdictSub.textContent = "Pemeriksaan lokal terbatas; verifikasi format dan sumber file.";
     riskBadge.textContent = "VERIFIKASI";
     riskBadge.classList.add("grade-mid");
-    reasonNarrative.innerHTML = `<strong>Mengapa statusnya Perlu Verifikasi Sumber?</strong> Karena ${escapeHtml(alasanRingkas.join("; "))}.`;
+    reasonNarrative.textContent = `Indikator: ${alasanRingkas.slice(0, 2).join("; ")}.`;
   } else {
-    verdictTitle.textContent = "INDIKASI RISIKO RENDAH";
-    verdictSub.textContent = "Tidak ditemukan penyamaran pada pemeriksaan lokal terbatas.";
+    verdictTitle.textContent = "TIDAK ADA POLA LOKAL MENONJOL";
+    verdictSub.textContent = "Ini bukan hasil antivirus atau jaminan file aman.";
     riskBadge.textContent = "RENDAH";
-    reasonNarrative.innerHTML = `<strong>Mengapa indikatornya Risiko Rendah?</strong><br/>1. <strong>Header Biner Cocok:</strong> Tanda tangan biner (<em>magic bytes</em>: <code>${escapeHtml(sig.tipe)}</code>) sesuai dengan ekstensi nama file <code>.${escapeHtml(ekstensiAkhir)}</code>.<br/>2. <strong>Bukan Format Eksekusi:</strong> Tidak ditemukan ekstensi ganda atau format eksekusi dari pemeriksaan lokal. Status ini <strong>bukan hasil antivirus atau bukti file bebas malware</strong>.`;
+    reasonNarrative.textContent = `Format terdeteksi: ${sig.tipe}. Pemeriksaan tidak memastikan file bebas malware.`;
   }
 
   document.getElementById("fileNameVal").textContent = namaFile;

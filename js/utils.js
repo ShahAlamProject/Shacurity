@@ -1,5 +1,5 @@
 /* ==========================================================================
-   UTILS.JS — Ikon SVG, Sanitasi HTML, Pembersih Tag MDN, Toast & Kriptografi
+   UTILS.JS — Ikon SVG, Sanitasi HTML, Toast & Kriptografi
    ========================================================================== */
 
 const SVG_ICONS = {
@@ -24,48 +24,6 @@ function escapeHtml(str) {
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;");
-}
-
-// Hapus tag <p> dari deskripsi MDN Observatory dan pertahankan <code> secara aman
-function formatDeskripsiMdn(teks) {
-  const tanpaParagraf = String(teks || "-")
-    .replace(/<\/?p>/gi, " ")
-    .replace(/\s+/g, " ")
-    .trim();
-  return escapeHtml(tanpaParagraf)
-    .replace(/&lt;code&gt;/gi, "<code>")
-    .replace(/&lt;\/code&gt;/gi, "</code>");
-}
-
-function hitungUmurHari(isoString) {
-  if (!isoString) return null;
-  const d = new Date(isoString);
-  if (Number.isNaN(d.getTime())) return null;
-  return Math.floor((Date.now() - d.getTime()) / (1000 * 60 * 60 * 24));
-}
-
-function formatTanggalId(isoString) {
-  if (!isoString) return null;
-  const d = new Date(isoString);
-  if (Number.isNaN(d.getTime())) return null;
-  return d.toLocaleDateString("id-ID", {
-    day: "numeric",
-    month: "long",
-    year: "numeric"
-  });
-}
-
-function formatTanggalWaktuId(isoString) {
-  if (!isoString) return "Tidak tersedia";
-  const d = new Date(isoString);
-  if (Number.isNaN(d.getTime())) return isoString;
-  return d.toLocaleString("id-ID", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit"
-  });
 }
 
 // Perhitungan Hash MD5 Lokal (Pure JavaScript)

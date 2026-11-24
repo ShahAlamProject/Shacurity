@@ -1,5 +1,5 @@
 /* ==========================================================================
-   APP.JS — Pengendali UI, Tema, Animasi Visual & Integrasi API RDAP/DNS/MDN
+   APP.JS — Pengendali UI, Tema, Navigasi & Pemeriksaan Domain Online
    ========================================================================== */
 
 // 0. Terms and Conditions Gate
@@ -9,7 +9,7 @@ const termsAcceptBtn = document.getElementById("termsAcceptBtn");
 if (termsOverlay && termsCheckbox && termsAcceptBtn) {
   let termsAccepted = false;
   try {
-    termsAccepted = localStorage.getItem("shacurity-terms-v1") === "accepted";
+    termsAccepted = localStorage.getItem("shacurity-terms-v2") === "accepted";
   } catch (_) {}
 
   if (termsAccepted) {
@@ -28,7 +28,7 @@ if (termsOverlay && termsCheckbox && termsAcceptBtn) {
   termsAcceptBtn.addEventListener("click", () => {
     if (!termsCheckbox.checked) return;
     try {
-      localStorage.setItem("shacurity-terms-v1", "accepted");
+      localStorage.setItem("shacurity-terms-v2", "accepted");
     } catch (_) {}
     termsOverlay.classList.add("hidden");
     termsOverlay.setAttribute("aria-hidden", "true");
@@ -48,30 +48,106 @@ window.addEventListener("scroll", () => {
 
 const primaryNav = document.querySelector(".nav-center");
 const primaryNavLinks = primaryNav ? primaryNav.querySelectorAll(".nav-link") : [];
+const mobileNavLinks = document.querySelectorAll(".mobile-nav-list a");
 const setActiveNavLink = (href) => {
-  let activeIndex = -1;
-  primaryNavLinks.forEach((link, index) => {
+  let activeLink = null;
+  primaryNavLinks.forEach((link) => {
     if (link.getAttribute("href") === href) {
       link.setAttribute("aria-current", "page");
-      activeIndex = index;
+      activeLink = link;
     } else {
       link.removeAttribute("aria-current");
     }
   });
-  if (primaryNav && activeIndex >= 0) {
-    primaryNav.style.setProperty("--active-nav-offset", `${activeIndex * 50}px`);
+  mobileNavLinks.forEach((link) => {
+    if (link.getAttribute("href") === href) {
+      link.setAttribute("aria-current", "page");
+    } else {
+      link.removeAttribute("aria-current");
+    }
+  });
+  if (primaryNav && activeLink) {
+    const navRect = primaryNav.getBoundingClientRect();
+    const activeLinkRect = activeLink.getBoundingClientRect();
+    primaryNav.style.setProperty("--active-nav-x", `${activeLinkRect.left - navRect.left}px`);
+    primaryNav.style.setProperty("--active-nav-y", `${activeLinkRect.top - navRect.top}px`);
+    primaryNav.style.setProperty("--active-nav-width", `${activeLinkRect.width}px`);
+    primaryNav.style.setProperty("--active-nav-height", `${activeLinkRect.height}px`);
     primaryNav.classList.add("has-active");
   } else if (primaryNav) {
-    primaryNav.style.removeProperty("--active-nav-offset");
+    primaryNav.style.removeProperty("--active-nav-x");
+    primaryNav.style.removeProperty("--active-nav-y");
+    primaryNav.style.removeProperty("--active-nav-width");
+    primaryNav.style.removeProperty("--active-nav-height");
     primaryNav.classList.remove("has-active");
   }
 };
 
+const navSections = Array.from(primaryNavLinks)
+  .map((link) => ({
+    href: link.getAttribute("href"),
+    section: document.querySelector(link.getAttribute("href"))
+  }))
+  .filter((item) => item.section);
+let pendingNavHref = "";
+let navScrollSettleTimer = null;
+let navScrollUpdatePending = false;
+const finishPendingNavScroll = () => {
+  if (!pendingNavHref) return;
+  pendingNavHref = "";
+  if (navScrollSettleTimer !== null) {
+    window.clearTimeout(navScrollSettleTimer);
+    navScrollSettleTimer = null;
+  }
+  updateActiveNavFromScroll();
+};
+const schedulePendingNavScrollFinish = (delay) => {
+  if (navScrollSettleTimer !== null) window.clearTimeout(navScrollSettleTimer);
+  navScrollSettleTimer = window.setTimeout(finishPendingNavScroll, delay);
+};
+const updateActiveNavFromScroll = () => {
+  if (pendingNavHref) {
+    schedulePendingNavScrollFinish(180);
+    return;
+  }
+  if (navScrollUpdatePending) return;
+  navScrollUpdatePending = true;
+
+  window.requestAnimationFrame(() => {
+    navScrollUpdatePending = false;
+    if (pendingNavHref) {
+      schedulePendingNavScrollFinish(180);
+      return;
+    }
+    const activationPoint = Math.min(180, window.innerHeight * 0.3);
+    let activeHref = "";
+
+    navSections.forEach(({ href, section }) => {
+      if (section.getBoundingClientRect().top <= activationPoint) activeHref = href;
+    });
+
+    const reachedPageBottom =
+      window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 2;
+    if (reachedPageBottom && navSections.length > 0) {
+      activeHref = navSections[navSections.length - 1].href;
+    }
+
+    setActiveNavLink(activeHref);
+  });
+};
+
 if (window.location.hash) setActiveNavLink(window.location.hash);
 primaryNavLinks.forEach((link) => {
-  link.addEventListener("click", () => setActiveNavLink(link.getAttribute("href")));
+  link.addEventListener("click", () => {
+    pendingNavHref = link.getAttribute("href");
+    setActiveNavLink(pendingNavHref);
+    schedulePendingNavScrollFinish(1200);
+  });
 });
 window.addEventListener("hashchange", () => setActiveNavLink(window.location.hash));
+window.addEventListener("scroll", updateActiveNavFromScroll, { passive: true });
+window.addEventListener("resize", updateActiveNavFromScroll, { passive: true });
+updateActiveNavFromScroll();
 
 const navRailToggle = document.getElementById("navRailToggle");
 if (navbarWrapper && navRailToggle) {
@@ -119,6 +195,12 @@ if (mobileMenuTrigger && mobileSheet) {
   });
   mobileSheet.querySelectorAll("a").forEach((link) => {
     link.addEventListener("click", () => {
+      const href = link.getAttribute("href");
+      if (href && href.startsWith("#")) {
+        pendingNavHref = href;
+        setActiveNavLink(href);
+        schedulePendingNavScrollFinish(1200);
+      }
       if (link.dataset.mobileTab) {
         aktifkanTabLab(link.dataset.mobileTab);
         const ctas = link.closest(".mobile-sheet-ctas");
@@ -156,14 +238,22 @@ if (mobileMenuTrigger && mobileSheet) {
 // 2. Dark / Light Theme Toggle
 const htmlEl = document.documentElement;
 const themeBtn = document.getElementById("themeBtn");
+const faviconLink = document.getElementById("favicon");
 const savedTheme = localStorage.getItem("shacurity-theme");
 if (savedTheme) htmlEl.setAttribute("data-theme", savedTheme);
+const updateFavicon = (theme) => {
+  if (faviconLink) {
+    faviconLink.href = theme === "light" ? "logohplightmode.png" : "logohpdarkmode.png";
+  }
+};
+updateFavicon(htmlEl.getAttribute("data-theme"));
 
 if (themeBtn) {
   themeBtn.addEventListener("click", () => {
     const next = htmlEl.getAttribute("data-theme") === "dark" ? "light" : "dark";
     htmlEl.setAttribute("data-theme", next);
     localStorage.setItem("shacurity-theme", next);
+    updateFavicon(next);
   });
 }
 
@@ -382,12 +472,40 @@ if (globeCanvas) {
   drawGlobe();
 }
 
-// 5. Helper Metadata & Rapor MDN Observatory
-function adalahDomainGoogle(host) {
-  return /(^|\.)(google\.[a-z.]+|youtube\.com|youtu\.be|gmail\.com|gstatic\.com|googleapis\.com)$/i.test(host);
-}
+// 5. Heuristik lokal untuk domain dan tautan
+const PHISHING_RULES = {
+  suspiciousTlds: [
+    "xyz", "top", "click", "work", "tk", "ml", "ga", "cf", "gq",
+    "zip", "mov", "rest", "surf", "loan", "win", "bid", "icu", "buzz"
+  ],
+  urgencyKeywords: [
+    "login", "signin", "sign-in", "verifikasi", "verify", "update",
+    "blokir", "suspend", "suspended", "otp", "password", "sandi",
+    "hadiah", "bansos", "klaim", "undi", "undian", "resi", "paket",
+    "tagihan", "akun", "keamanan", "security", "darurat", "urgent",
+    "konfirmasi", "aktivasi", "unlock", "restore"
+  ],
+  protectedBrands: [
+    { nama: "BRI", kata: ["bri", "brimo", "ibank-bri"], resmi: ["bri.co.id"] },
+    { nama: "BCA", kata: ["bca", "klikbca", "mybca"], resmi: ["bca.co.id", "klikbca.com"] },
+    { nama: "Mandiri", kata: ["mandiri", "livin"], resmi: ["bankmandiri.co.id", "bankmandiri.id"] },
+    { nama: "BNI", kata: ["bni", "wondr"], resmi: ["bni.co.id"] },
+    { nama: "DANA", kata: ["dana"], resmi: ["dana.id"] },
+    { nama: "OVO", kata: ["ovo"], resmi: ["ovo.id"] },
+    { nama: "GoPay / Gojek", kata: ["gopay", "gojek"], resmi: ["gopay.co.id", "gojek.com"] },
+    { nama: "Shopee", kata: ["shopee", "shopeepay"], resmi: ["shopee.co.id", "shopee.com"] },
+    { nama: "Google", kata: ["google", "gmail", "accounts-google"], resmi: ["google.com", "google.co.id", "accounts.google.com"] },
+    { nama: "Microsoft", kata: ["microsoft", "office365", "outlook"], resmi: ["microsoft.com", "live.com", "office.com"] },
+    { nama: "Instagram", kata: ["instagram"], resmi: ["instagram.com"] },
+    { nama: "WhatsApp", kata: ["whatsapp"], resmi: ["whatsapp.com"] },
+    { nama: "Facebook", kata: ["facebook"], resmi: ["facebook.com"] },
+    { nama: "UMM", kata: ["umm", "infokhs"], resmi: ["umm.ac.id"] },
+    { nama: "BPJS", kata: ["bpjs", "bpjskesehatan"], resmi: ["bpjs-kesehatan.go.id", "bpjsketenagakerjaan.go.id"] },
+    { nama: "JNE / J&T", kata: ["jne", "jnt", "jet"], resmi: ["jne.co.id", "jet.co.id"] }
+  ]
+};
 
-function hitungRisikoLinkTerpadu(rawInput, hostname, pslResult, umurHari) {
+function hitungRisikoLinkTerpadu(rawInput, hostname, pslResult) {
   let skor = 0;
   const temuan = [];
   let parsed = null;
@@ -409,7 +527,8 @@ function hitungRisikoLinkTerpadu(rawInput, hostname, pslResult, umurHari) {
     temuan.push("Host menggunakan alamat IP langsung");
   }
 
-  if (parsed.protocol === "http:") {
+  const hasExplicitScheme = /^[a-z][a-z0-9+.-]*:\/\//i.test(String(rawInput || "").trim());
+  if (hasExplicitScheme && parsed.protocol === "http:") {
     skor += 15;
     temuan.push("Koneksi menggunakan HTTP tanpa HTTPS");
   }
@@ -468,14 +587,6 @@ function hitungRisikoLinkTerpadu(rawInput, hostname, pslResult, umurHari) {
     temuan.push(`Subdomain terlalu bertingkat (${pslResult.subdomainLabels.length} tingkat)`);
   }
 
-  if (umurHari !== null && umurHari < 30) {
-    skor += 30;
-    temuan.push(`Domain sangat baru (${umurHari} hari)`);
-  } else if (umurHari !== null && umurHari < 180) {
-    skor += 15;
-    temuan.push(`Domain relatif baru (${umurHari} hari)`);
-  }
-
   if (parsed.href.length > 105) {
     skor += 10;
     temuan.push("URL sangat panjang");
@@ -484,23 +595,7 @@ function hitungRisikoLinkTerpadu(rawInput, hostname, pslResult, umurHari) {
   return { skor: Math.min(100, skor), temuan: [...new Set(temuan)] };
 }
 
-function keteranganNilai(grade) {
-  const g = (grade || "").toUpperCase();
-  if (g.startsWith("A")) return "Sangat Baik";
-  if (g.startsWith("B")) return "Baik";
-  if (g.startsWith("C")) return "Cukup";
-  if (g.startsWith("D")) return "Kurang";
-  if (g.startsWith("F")) return "Perlu Perbaikan";
-  return "Hasil Pindai";
-}
-
-function rapikanNamaTes(slug) {
-  return slug
-    .replace(/-/g, " ")
-    .replace(/\b\w/g, (huruf) => huruf.toUpperCase());
-}
-
-// 6. Pemeriksaan Terpadu DomainUtama (PSL) + RDAP + DNS + MDN Observatory
+// 6. Pemeriksaan domain dan tautan lokal serta online
 const unifiedForm = document.getElementById("unifiedForm");
 const hostInput = document.getElementById("hostInput");
 const submitBtn = document.getElementById("submitBtn");
@@ -509,33 +604,352 @@ const resultsArea = document.getElementById("resultsArea");
 const toggleJsonBtn = document.getElementById("toggleJsonBtn");
 const toggleJsonLabel = document.getElementById("toggleJsonLabel");
 const rawJsonPanel = document.getElementById("rawJsonPanel");
-const loadFullPslBtn = document.getElementById("loadFullPslBtn");
-const loadFullPslLabel = document.getElementById("loadFullPslLabel");
 let masukanTerakhir = "";
 let activeController = null;
+let activeOnlineTimeout = null;
+let activeOnlineRequestId = 0;
 
-if (loadFullPslBtn) {
-  loadFullPslBtn.addEventListener("click", async () => {
-    loadFullPslBtn.disabled = true;
-    loadFullPslLabel.textContent = "Memuat PSL Lengkap...";
+function setOnlineStatus(id, message, state) {
+  const element = document.getElementById(id);
+  if (!element) return;
+  element.textContent = message;
+  element.classList.remove("online-status-success", "online-status-error", "online-status-warning");
+  if (state === "success") element.classList.add("online-status-success");
+  if (state === "error") element.classList.add("online-status-error");
+  if (state === "warning") element.classList.add("online-status-warning");
+}
 
+function formatTanggalOnline(value) {
+  if (!value) return null;
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+  return date.toLocaleDateString("id-ID", {
+    day: "numeric",
+    month: "short",
+    year: "numeric"
+  });
+}
+
+function hitungUmurDomainHari(value) {
+  if (!value) return null;
+  const timestamp = new Date(value).getTime();
+  if (Number.isNaN(timestamp)) return null;
+  return Math.max(0, Math.floor((Date.now() - timestamp) / 86400000));
+}
+
+function errorLayananOnline(error) {
+  if (error && error.name === "AbortError") return "Permintaan dibatalkan atau melewati batas waktu.";
+  return error && error.message ? error.message : "Terjadi kesalahan jaringan.";
+}
+
+function buatSinyalDenganTimeout(parentSignal, timeoutMs) {
+  const controller = new AbortController();
+  const abortParent = () => controller.abort();
+  if (parentSignal) {
+    if (parentSignal.aborted) controller.abort();
+    else parentSignal.addEventListener("abort", abortParent, { once: true });
+  }
+  const timeoutId = window.setTimeout(() => controller.abort(), timeoutMs);
+  return {
+    signal: controller.signal,
+    dispose() {
+      window.clearTimeout(timeoutId);
+      if (parentSignal) parentSignal.removeEventListener("abort", abortParent);
+    }
+  };
+}
+
+async function ambilJsonOnline(url, options) {
+  const response = await fetch(url, options);
+  if (!response.ok) {
+    const error = new Error(`HTTP ${response.status}`);
+    error.status = response.status;
+    throw error;
+  }
+  try {
+    return await response.json();
+  } catch (_) {
+    throw new Error("Layanan mengirim respons JSON yang tidak valid.");
+  }
+}
+
+async function periksaDnsOnline(hostname, signal, requestId) {
+  setOnlineStatus("dnsStatus", "Memeriksa DNS publik...");
+  const request = buatSinyalDenganTimeout(signal, 8000);
+  try {
+    const data = await ambilJsonOnline(
+      `https://dns.google/resolve?name=${encodeURIComponent(hostname)}&type=A`,
+      { signal: request.signal, headers: { Accept: "application/json" } }
+    );
+    if (requestId !== activeOnlineRequestId) return;
+    if (data.Status !== 0 && data.Status !== 3) {
+      throw new Error(`Layanan DNS mengembalikan kode ${data.Status}.`);
+    }
+
+    const addresses = Array.isArray(data.Answer)
+      ? data.Answer.filter((answer) => answer.type === 1 && answer.data).map((answer) => answer.data)
+      : [];
+    document.getElementById("resIpAddress").textContent =
+      addresses.length ? [...new Set(addresses)].join(", ") : "Alamat IPv4 tidak ditemukan";
+    document.getElementById("resIpHost").textContent = `Catatan DNS A untuk ${hostname}`;
+    setOnlineStatus(
+      "dnsStatus",
+      data.Status === 3 ? "DNS merespons: nama tidak ditemukan (NXDOMAIN)" : "DNS berhasil diperiksa",
+      data.Status === 3 ? "warning" : "success"
+    );
+  } catch (error) {
+    if (requestId !== activeOnlineRequestId) return;
+    document.getElementById("resIpAddress").textContent = "Tidak tersedia";
+    document.getElementById("resIpHost").textContent = "Alamat tidak dapat diperoleh dari layanan DNS.";
+    setOnlineStatus("dnsStatus", `DNS gagal: ${errorLayananOnline(error)}`, "error");
+  } finally {
+    request.dispose();
+  }
+}
+
+async function periksaRdapOnline(domainUtama, signal, requestId) {
+  setOnlineStatus("rdapStatus", "Memeriksa data pendaftaran...");
+  const request = buatSinyalDenganTimeout(signal, 8000);
+  try {
+    const data = await ambilJsonOnline(
+      `https://rdap.org/domain/${encodeURIComponent(domainUtama)}`,
+      { signal: request.signal, headers: { Accept: "application/rdap+json, application/json" } }
+    );
+    if (requestId !== activeOnlineRequestId) return;
+
+    const events = Array.isArray(data.events) ? data.events : [];
+    const registration = events.find((event) =>
+      ["registration", "registered"].includes(String(event.eventAction || "").toLowerCase())
+    );
+    const expiration = events.find((event) =>
+      ["expiration", "expired"].includes(String(event.eventAction || "").toLowerCase())
+    );
+    const registrationDate = registration ? formatTanggalOnline(registration.eventDate) : null;
+    const expirationDate = expiration ? formatTanggalOnline(expiration.eventDate) : null;
+    const ageDays = registration ? hitungUmurDomainHari(registration.eventDate) : null;
+
+    document.getElementById("resRegDate").textContent = registrationDate || "Tanggal pendaftaran tidak tersedia";
+    const ageText = ageDays === null
+      ? "Umur domain tidak tersedia"
+      : `Terdaftar sekitar ${ageDays >= 365 ? `${Math.floor(ageDays / 365)} tahun` : `${ageDays} hari`} yang lalu`;
+    document.getElementById("resDomainAge").textContent =
+      `${ageText}${expirationDate ? ` • Berlaku s.d. ${expirationDate}` : ""}`;
+    setOnlineStatus("rdapStatus", "Data RDAP berhasil dimuat", "success");
+  } catch (error) {
+    if (requestId !== activeOnlineRequestId) return;
+    document.getElementById("resRegDate").textContent = "Tidak tersedia";
+    document.getElementById("resDomainAge").textContent = "Data pendaftaran tidak dapat diperoleh.";
+    setOnlineStatus("rdapStatus", `RDAP gagal: ${errorLayananOnline(error)}`, "error");
+  } finally {
+    request.dispose();
+  }
+}
+
+async function ambilLaporanSecurityHeaders(hostname, signal) {
+  const url =
+    `https://securityheaders.com/?q=${encodeURIComponent(`https://${hostname}`)}` +
+    "&followRedirects=on";
+  const response = await fetch(url, { signal, headers: { Accept: "text/html" } });
+  if (!response.ok) {
+    const error = new Error(`HTTP ${response.status}`);
+    error.status = response.status;
+    throw error;
+  }
+
+  const html = await response.text();
+  const reportDocument = new DOMParser().parseFromString(html, "text/html");
+  const gradeElement = reportDocument.querySelector(".score");
+  const grade = gradeElement ? String(gradeElement.textContent || "").trim() : "";
+  if (!grade) throw new Error("Laporan header tidak ditemukan dalam respons layanan.");
+
+  const missingSection = [...reportDocument.querySelectorAll(".reportSection")].find((section) => {
+    const title = section.querySelector(".reportTitle");
+    return title && /missing headers/i.test(title.textContent || "");
+  });
+  if (!missingSection) throw new Error("Bagian header laporan tidak ditemukan.");
+  const missingHeaders = missingSection
+    ? [...missingSection.querySelectorAll("th.tableLabel")]
+      .map((element) => String(element.textContent || "").trim())
+      .filter(Boolean)
+    : [];
+  const reportTimeLabel = [...reportDocument.querySelectorAll("th.tableLabel")]
+    .find((element) => /^Report Time:?$/i.test(String(element.textContent || "").trim()));
+  const reportTime = reportTimeLabel && reportTimeLabel.nextElementSibling
+    ? String(reportTimeLabel.nextElementSibling.textContent || "").trim()
+    : "";
+
+  return { grade, missingHeaders, reportTime };
+}
+
+async function periksaSecurityHeadersOnline(hostname, signal, requestId) {
+  setOnlineStatus("obsStatusTag", "Memeriksa konfigurasi HTTP...");
+  const notice = document.getElementById("obsNoticeBox");
+  notice.style.display = "none";
+  const request = buatSinyalDenganTimeout(signal, 12000);
+  try {
+    const report = await ambilLaporanSecurityHeaders(hostname, request.signal);
+    if (requestId !== activeOnlineRequestId) return;
+
+    const gradeElement = document.getElementById("raporGrade");
+    gradeElement.textContent = report.grade;
+    gradeElement.className = "grade-badge";
+    if (/^[BC]/i.test(report.grade)) gradeElement.classList.add("grade-mid");
+    if (/^[DF]/i.test(report.grade)) gradeElement.classList.add("grade-low");
+    document.getElementById("raporScore").textContent =
+      report.reportTime ? `Laporan: ${report.reportTime}` : "Laporan online";
+    document.getElementById("raporPassed").textContent = report.missingHeaders.length
+      ? `${report.missingHeaders.length} header perlu diperiksa`
+      : "Tidak ada header rekomendasi yang hilang dalam laporan.";
+    notice.textContent = report.missingHeaders.length
+      ? `Header yang dilaporkan hilang: ${report.missingHeaders.join(", ")}`
+      : "Laporan tidak mencantumkan header yang hilang.";
+    notice.style.display = "block";
+    setOnlineStatus("obsStatusTag", "Laporan SecurityHeaders.com berhasil dimuat", "success");
+  } catch (error) {
+    if (requestId !== activeOnlineRequestId) return;
+    document.getElementById("raporGrade").textContent = "N/A";
+    document.getElementById("raporScore").textContent = "Laporan tidak tersedia";
+    document.getElementById("raporPassed").textContent = "Data header belum dapat diperoleh.";
+    setOnlineStatus("obsStatusTag", `SecurityHeaders.com gagal: ${errorLayananOnline(error)}`, "error");
+    notice.textContent = "Layanan laporan header tidak memberikan hasil. Coba pindai ulang nanti.";
+    notice.style.display = "block";
+  } finally {
+    request.dispose();
+  }
+}
+
+function setCertificateStatus(message, isError) {
+  const status = document.getElementById("certHistoryStatus");
+  status.className = `cek-status-banner show${isError ? " error" : ""}`;
+  status.textContent = message;
+}
+
+async function ambilRiwayatSertifikat(domainUtama, signal, requestId) {
+  const url =
+    `https://api.certspotter.com/v1/issuances?domain=${encodeURIComponent(domainUtama)}` +
+    "&include_subdomains=true&expand=issuer&expand=dns_names";
+  let lastError;
+
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    const request = buatSinyalDenganTimeout(signal, 5000);
     try {
-      const res = await fetch("https://raw.githubusercontent.com/publicsuffix/list/main/public_suffix_list.dat");
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const teksDat = await res.text();
-      parseDanTerapkanPslDat(teksDat);
-      loadFullPslLabel.textContent = `PSL Lengkap Aktif (${pslStore.totalCount.toLocaleString("id-ID")})`;
-      showToast(`Berhasil memuat ${pslStore.totalCount.toLocaleString("id-ID")} aturan Public Suffix List!`);
-
-      if (masukanTerakhir) {
-        jalankanPemeriksaanTerpadu(masukanTerakhir, false);
+      const response = await fetch(url, { signal: request.signal, headers: { Accept: "application/json" } });
+      if (!response.ok) {
+        const error = new Error(`HTTP ${response.status}`);
+        error.status = response.status;
+        throw error;
       }
-    } catch (_) {
-      muatAturanRingkasBawaan();
-      loadFullPslLabel.textContent = "Muat Ulang PSL Lengkap";
-      showToast("Gagal memuat PSL dari internet. Tetap memakai daftar ringkas bawaan (19 aturan).");
+      const data = await response.json();
+      if (!Array.isArray(data)) throw new Error("Respons CertSpotter bukan daftar sertifikat yang valid.");
+      return data;
+    } catch (error) {
+      lastError = error;
+      if (signal.aborted || attempt === 3 || (error.status && error.status < 500 && error.status !== 429)) break;
+      if (requestId === activeOnlineRequestId) {
+        setCertificateStatus(`Percobaan ${attempt}/3 gagal; mencoba kembali...`, false);
+      }
+      await new Promise((resolve) => window.setTimeout(resolve, attempt * 400));
     } finally {
-      loadFullPslBtn.disabled = false;
+      request.dispose();
+    }
+  }
+
+  throw lastError || new Error("Riwayat sertifikat tidak dapat dimuat.");
+}
+
+function tampilkanRiwayatSertifikat(issuances) {
+  const tbody = document.getElementById("certHistoryTableBody");
+  tbody.replaceChildren();
+
+  const now = Date.now();
+  const currentIssuances = issuances
+    .filter((item) => {
+      const expiration = new Date(item.not_after || "").getTime();
+      return Number.isFinite(expiration) && expiration >= now;
+    })
+    .sort((a, b) => new Date(b.not_before || 0).getTime() - new Date(a.not_before || 0).getTime());
+
+  document.getElementById("certHistoryCount").textContent = currentIssuances.length.toLocaleString("id-ID");
+  const issuerCounts = new Map();
+  currentIssuances.forEach((item) => {
+    const issuer = item.issuer && (item.issuer.friendly_name || item.issuer.name)
+      ? String(item.issuer.friendly_name || item.issuer.name)
+      : "Tidak diketahui";
+    issuerCounts.set(issuer, (issuerCounts.get(issuer) || 0) + 1);
+  });
+  const mostCommonIssuer = [...issuerCounts.entries()].sort((a, b) => b[1] - a[1])[0];
+  document.getElementById("certHistoryTopIssuer").textContent =
+    mostCommonIssuer ? `${mostCommonIssuer[0]} (${mostCommonIssuer[1]})` : "Tidak tersedia";
+
+  currentIssuances.slice(0, 20).forEach((item) => {
+    const row = document.createElement("tr");
+    const nameCell = document.createElement("td");
+    const issuerCell = document.createElement("td");
+    const expirationCell = document.createElement("td");
+    const names = Array.isArray(item.dns_names) ? item.dns_names.filter(Boolean) : [];
+    nameCell.textContent = names.slice(0, 5).join(", ") +
+      (names.length > 5 ? ` dan ${names.length - 5} nama lain` : "") || "Tidak diketahui";
+    issuerCell.textContent = item.issuer
+      ? String(item.issuer.friendly_name || item.issuer.name || "Tidak diketahui")
+      : "Tidak diketahui";
+    expirationCell.textContent = formatTanggalOnline(item.not_after) || "Tidak diketahui";
+    row.append(nameCell, issuerCell, expirationCell);
+    tbody.appendChild(row);
+  });
+}
+
+async function periksaSertifikatOnline(domainUtama, signal, requestId) {
+  document.getElementById("certHistoryCount").textContent = "Memuat...";
+  document.getElementById("certHistoryTopIssuer").textContent = "Memuat...";
+  setCertificateStatus("Memuat riwayat sertifikat (maksimal 3 percobaan)...", false);
+  try {
+    const issuances = await ambilRiwayatSertifikat(domainUtama, signal, requestId);
+    if (requestId !== activeOnlineRequestId) return;
+    tampilkanRiwayatSertifikat(issuances);
+    setCertificateStatus(
+      issuances.length
+        ? `Berhasil dimuat. Menampilkan maksimal 20 sertifikat yang belum kedaluwarsa (dari ${issuances.length} hasil layanan).`
+        : "Layanan tidak mengembalikan sertifikat untuk domain ini.",
+      false
+    );
+  } catch (error) {
+    if (requestId !== activeOnlineRequestId) return;
+    document.getElementById("certHistoryCount").textContent = "Tidak tersedia";
+    document.getElementById("certHistoryTopIssuer").textContent = "Tidak tersedia";
+    document.getElementById("certHistoryTableBody").replaceChildren();
+    setCertificateStatus(`Riwayat sertifikat gagal dimuat: ${errorLayananOnline(error)}`, true);
+  }
+}
+
+function mulaiPemeriksaanOnline(hostname, domainUtama, requestId) {
+  if (activeController) activeController.abort();
+  if (activeOnlineTimeout) window.clearTimeout(activeOnlineTimeout);
+
+  const controller = new AbortController();
+  activeController = controller;
+  activeOnlineTimeout = window.setTimeout(() => controller.abort(), 30000);
+
+  document.getElementById("certHistoryTarget").textContent = `Domain: ${domainUtama}`;
+  document.getElementById("resIpAddress").textContent = "Memeriksa...";
+  document.getElementById("resIpHost").textContent = `Host: ${hostname}`;
+  document.getElementById("resRegDate").textContent = "Memeriksa...";
+  document.getElementById("resDomainAge").textContent = "-";
+  document.getElementById("raporGrade").textContent = "...";
+  document.getElementById("raporGrade").className = "grade-badge";
+  document.getElementById("raporScore").textContent = "Skor sedang dimuat";
+  document.getElementById("raporPassed").textContent = "Menunggu hasil pemindaian...";
+  setCertificateStatus("Menunggu layanan sertifikat...", false);
+
+  Promise.all([
+    periksaDnsOnline(hostname, controller.signal, requestId),
+    periksaRdapOnline(domainUtama, controller.signal, requestId),
+    periksaSecurityHeadersOnline(hostname, controller.signal, requestId),
+    periksaSertifikatOnline(domainUtama, controller.signal, requestId)
+  ]).finally(() => {
+    if (requestId === activeOnlineRequestId) {
+      if (activeOnlineTimeout) window.clearTimeout(activeOnlineTimeout);
+      activeOnlineTimeout = null;
+      activeController = null;
     }
   });
 }
@@ -550,44 +964,13 @@ function sembunyikanStatus() {
   statusBanner.innerHTML = "";
 }
 
-async function ambilDataObservatory(host, signal, paksaSegar) {
-  const cacheKey = `shacurity_obs_${host}`;
-  if (!paksaSegar) {
-    try {
-      const cached = JSON.parse(sessionStorage.getItem(cacheKey) || "null");
-      if (cached && Date.now() - cached.savedAt < 15 * 60 * 1000) {
-        return { ok: true, data: cached.data, fromCache: true };
-      }
-    } catch (_) {}
-  }
+function jalankanPemeriksaanTerpadu(inputMentah) {
+  const requestId = ++activeOnlineRequestId;
+  if (activeController) activeController.abort();
+  if (activeOnlineTimeout) window.clearTimeout(activeOnlineTimeout);
+  activeController = null;
+  activeOnlineTimeout = null;
 
-  const endpointAnalyze = `https://observatory-api.mdn.mozilla.net/api/v2/analyze?host=${encodeURIComponent(host)}`;
-  let res = await fetch(endpointAnalyze, { signal });
-
-  if (res.status === 404) {
-    await fetch(
-      `https://observatory-api.mdn.mozilla.net/api/v2/scan?host=${encodeURIComponent(host)}`,
-      { method: "POST", signal }
-    );
-    res = await fetch(endpointAnalyze, { signal });
-  }
-
-  const data = await res.json().catch(() => null);
-
-  if (res.status === 422) return { ok: false, status: 422, data };
-  if (!res.ok || !data) return { ok: false, status: res.status, data };
-
-  const scan = data.scan ? data.scan : data;
-  if (scan.error) return { ok: false, status: 422, data: scan };
-
-  try {
-    sessionStorage.setItem(cacheKey, JSON.stringify({ savedAt: Date.now(), data }));
-  } catch (_) {}
-
-  return { ok: true, data, fromCache: false };
-}
-
-async function jalankanPemeriksaanTerpadu(inputMentah, paksaSegar = false) {
   const hasilEkstraksi = ekstrakHostnameDariMasukan(inputMentah);
   if (!hasilEkstraksi.valid) {
     resultsArea.style.display = "none";
@@ -614,15 +997,9 @@ async function jalankanPemeriksaanTerpadu(inputMentah, paksaSegar = false) {
     return;
   }
 
-  if (activeController) activeController.abort();
-  const controller = new AbortController();
-  activeController = controller;
-  const timeoutId = setTimeout(() => controller.abort(), 16000);
-
   masukanTerakhir = inputMentah;
   rawJsonPanel.classList.remove("open");
   if (toggleJsonLabel) toggleJsonLabel.textContent = "Lihat JSON Mentah";
-  submitBtn.disabled = true;
 
   const {
     labels,
@@ -690,7 +1067,7 @@ async function jalankanPemeriksaanTerpadu(inputMentah, paksaSegar = false) {
     suffixTypeNote.textContent = "Akhiran layanan/platform yang memungkinkan siapa saja mendaftarkan alamat di bawahnya.";
   } else {
     suffixTypeWrap.innerHTML = `<span class="suffix-type-badge fallback">Label Terakhir (Fallback)</span>`;
-    suffixTypeNote.textContent = "Tidak ditemukan di daftar ringkas; klik 'Muat Public Suffix List Lengkap' untuk cakupan penuh.";
+    suffixTypeNote.textContent = "Akhiran tidak terdaftar dalam PSL lokal ringkas; batas domain utama mungkin tidak tepat.";
   }
 
   // Evaluasi 5 Tanda Waspada Struktur Alamat
@@ -756,91 +1133,7 @@ async function jalankanPemeriksaanTerpadu(inputMentah, paksaSegar = false) {
   renderDaftarWaspada(tandaWaspadaPsl);
   resultsArea.style.display = "block";
 
-  setStatus(
-    "loading",
-    `<span class="spinner"></span><span>Domain utama <strong>${escapeHtml(domainUtama)}</strong> berhasil dipecah. Memeriksa metadata RDAP, DNS, dan rapor HTTP MDN Observatory...</span>`
-  );
-
-  const [rdapSettled, dnsSettled, obsSettled] = await Promise.allSettled([
-    fetch(`https://rdap.org/domain/${encodeURIComponent(domainUtama)}`, {
-      headers: { Accept: "application/rdap+json, application/json" },
-      signal: controller.signal
-    }),
-    fetch(`https://dns.google/resolve?name=${encodeURIComponent(hostname)}&type=A`, {
-      signal: controller.signal
-    }),
-    ambilDataObservatory(hostname, controller.signal, paksaSegar)
-  ]);
-
-  clearTimeout(timeoutId);
-  if (activeController === controller) {
-    activeController = null;
-    submitBtn.disabled = false;
-  }
-
-  let rdapData = null;
-  let rdapStatusHttp = "Tidak terjangkau";
-  if (rdapSettled.status === "fulfilled") {
-    rdapStatusHttp = `HTTP ${rdapSettled.value.status}`;
-    if (rdapSettled.value.ok) rdapData = await rdapSettled.value.json().catch(() => null);
-  }
-
-  let dnsData = null;
-  const daftarIp = [];
-  if (dnsSettled.status === "fulfilled" && dnsSettled.value.ok) {
-    dnsData = await dnsSettled.value.json().catch(() => null);
-    if (dnsData && Array.isArray(dnsData.Answer)) {
-      dnsData.Answer.forEach((ans) => {
-        if (ans.type === 1 && ans.data) daftarIp.push(ans.data);
-      });
-    }
-  }
-
-  if (daftarIp.length > 0) {
-    document.getElementById("resIpAddress").textContent = daftarIp.join(", ");
-    document.getElementById("resIpHost").textContent = `Catatan DNS A aktif untuk ${hostname}`;
-  } else {
-    document.getElementById("resIpAddress").textContent = "Data tidak ditemukan";
-    document.getElementById("resIpHost").textContent = `Tidak ada catatan IPv4 aktif untuk ${hostname}`;
-  }
-
-  let rawRegDate = null;
-  let rawExpDate = null;
-  if (rdapData && Array.isArray(rdapData.events)) {
-    const regEvent = rdapData.events.find(
-      (ev) => ev.eventAction === "registration" || ev.eventAction === "registered"
-    );
-    const expEvent = rdapData.events.find(
-      (ev) => ev.eventAction === "expiration" || ev.eventAction === "expired"
-    );
-    if (regEvent) rawRegDate = regEvent.eventDate;
-    if (expEvent) rawExpDate = expEvent.eventDate;
-  }
-
-  const teksReg = formatTanggalId(rawRegDate);
-  const teksExp = formatTanggalId(rawExpDate);
-  const umurHari = hitungUmurHari(rawRegDate);
-  if (teksReg) {
-    document.getElementById("resRegDate").textContent = teksReg;
-    const tahun = Math.floor(umurHari / 365);
-    document.getElementById("resDomainAge").textContent =
-      `Umur ~${tahun >= 1 ? tahun + " tahun" : umurHari + " hari"}` +
-      (teksExp ? ` • Berlaku s.d. ${teksExp}` : "");
-  } else {
-    document.getElementById("resRegDate").textContent = "Data tidak ditemukan";
-    document.getElementById("resDomainAge").textContent = `Status RDAP untuk ${domainUtama}: ${rdapStatusHttp}`;
-  }
-
-  const daftarWaspadaLengkap = [...tandaWaspadaPsl];
-  if (umurHari !== null && umurHari < 365) {
-    daftarWaspadaLengkap.push({
-      level: "warn",
-      teks: `Umur domain utama baru: "${domainUtama}" didaftarkan ${umurHari} hari yang lalu (kurang dari 1 tahun).`
-    });
-  }
-  renderDaftarWaspada(daftarWaspadaLengkap);
-
-  const risikoLink = hitungRisikoLinkTerpadu(inputMentah, hostname, pslResult, umurHari);
+  const risikoLink = hitungRisikoLinkTerpadu(inputMentah, hostname, pslResult);
   const riskSummary = document.getElementById("unifiedRiskSummary");
   const riskTitle = document.getElementById("unifiedRiskTitle");
   const riskText = document.getElementById("unifiedRiskText");
@@ -849,19 +1142,19 @@ async function jalankanPemeriksaanTerpadu(inputMentah, paksaSegar = false) {
 
   if (riskSummary) {
     riskSummary.style.display = "grid";
-    let kelas = "TIDAK ADA INDIKATOR KUAT";
-    let deskripsi = "Pemeriksaan heuristik lokal tidak menemukan indikator kuat penyamaran atau manipulasi tautan.";
+    let kelas = "TIDAK ADA POLA LOKAL YANG MENONJOL";
+    let deskripsi = "Skor pola lokal adalah indikator untuk diperiksa, bukan peluang atau bukti phishing.";
     let warna = "var(--green)";
     let badgeClass = "";
 
     if (risikoLink.skor >= 55) {
-      kelas = "TERINDIKASI PHISHING / BERISIKO TINGGI";
-      deskripsi = "Ditemukan pola penipuan atau penyamaran domain. Jangan memasukkan kredensial atau OTP.";
+      kelas = "BANYAK INDIKATOR PERLU DIPERIKSA";
+      deskripsi = "Ditemukan beberapa pola lokal. Verifikasi alamat melalui situs resmi sebelum memasukkan data.";
       warna = "var(--red)";
       badgeClass = "grade-low";
     } else if (risikoLink.skor >= 25) {
       kelas = "PERLU WASPADA";
-      deskripsi = "Tautan memiliki beberapa karakteristik yang perlu diverifikasi sebelum dibuka.";
+      deskripsi = "Tautan memiliki pola yang perlu diperiksa secara manual.";
       warna = "var(--amber)";
       badgeClass = "grade-mid";
     }
@@ -872,98 +1165,12 @@ async function jalankanPemeriksaanTerpadu(inputMentah, paksaSegar = false) {
 
     riskTitle.textContent = kelas;
     riskText.textContent = deskripsi;
-    riskBadge.textContent = `RISIKO ${risikoLink.skor}/100`;
+    riskBadge.textContent = `INDIKATOR ${risikoLink.skor}/100`;
     riskBadge.className = `grade-badge ${badgeClass}`.trim();
     if (riskMeter) {
       riskMeter.style.width = `${Math.max(6, risikoLink.skor)}%`;
       riskMeter.style.backgroundColor = warna;
     }
-  }
-
-  // Render Rapor MDN Observatory
-  const obsNoticeBox = document.getElementById("obsNoticeBox");
-  const obsMetricsWrapper = document.getElementById("obsMetricsWrapper");
-  const obsStatusTag = document.getElementById("obsStatusTag");
-  let obsRawForJson = null;
-
-  if (obsSettled.status === "fulfilled" && obsSettled.value.ok) {
-    const obsPayload = obsSettled.value.data;
-    obsRawForJson = obsPayload;
-    const scan = obsPayload.scan ? obsPayload.scan : obsPayload;
-    const testsObj = obsPayload.tests || {};
-
-    obsNoticeBox.style.display = "none";
-    obsMetricsWrapper.style.display = "block";
-    obsStatusTag.textContent = obsSettled.value.fromCache ? "Tersedia (Cache Sesi)" : "Berhasil Dimuat";
-    obsStatusTag.style.color = "var(--green)";
-
-    const nilai = scan.grade || "N/A";
-    const gradeEl = document.getElementById("raporGrade");
-    gradeEl.textContent = nilai;
-    gradeEl.className = "grade-badge";
-    if (/^[BC]/i.test(nilai)) gradeEl.classList.add("grade-mid");
-    if (/^[DF]/i.test(nilai)) gradeEl.classList.add("grade-low");
-    document.getElementById("raporGradeDesc").textContent = keteranganNilai(nilai);
-
-    const skor = scan.score !== undefined && scan.score !== null ? scan.score : "-";
-    document.getElementById("raporScore").textContent = `${skor} / 100`;
-
-    const lolos = scan.tests_passed ?? scan.testsPassed ?? 0;
-    const totalTes = scan.tests_quantity ?? scan.testsQuantity ?? Object.keys(testsObj).length;
-    document.getElementById("raporPassed").textContent = `${lolos} / ${totalTes} Tes`;
-    const persen = totalTes > 0 ? Math.round((lolos / totalTes) * 100) : 0;
-    document.getElementById("raporPassedPct").textContent = `${persen}% pemeriksaan lolos`;
-
-    const waktuPindai = scan.scanned_at || scan.scannedAt;
-    document.getElementById("raporDate").textContent = formatTanggalWaktuId(waktuPindai);
-    const algo = scan.algorithm_version || scan.algorithmVersion;
-    document.getElementById("raporAlgo").textContent = algo ? `Algoritma Observatory v${algo}` : "MDN HTTP Observatory";
-
-    const listContainer = document.getElementById("raporTestsList");
-    listContainer.innerHTML = "";
-    const entriesTes = Array.isArray(testsObj)
-      ? testsObj.map((item) => [item.name || "tes", item])
-      : Object.entries(testsObj);
-
-    document.getElementById("raporTestSummary").textContent = `${entriesTes.length} parameter diperiksa`;
-
-    entriesTes.forEach(([kodeTes, detail]) => {
-      const lulus = Boolean(detail.pass);
-      const mod = detail.score_modifier ?? detail.scoreModifier ?? 0;
-      const modLabel = mod > 0 ? `+${mod}` : `${mod}`;
-      const deskripsi = detail.score_description || detail.scoreDescription || detail.result || "-";
-
-      const itemEl = document.createElement("div");
-      itemEl.className = "obs-test-item";
-      itemEl.innerHTML = `
-        <div class="obs-test-top">
-          <div class="obs-test-title">
-            ${lulus ? SVG_ICONS.checkSmall : SVG_ICONS.xSmall}
-            <span>${escapeHtml(rapikanNamaTes(kodeTes))}</span>
-          </div>
-          <span class="obs-pass-tag ${lulus ? "pass" : "fail"}">
-            ${lulus ? "Lolos" : "Perlu Perbaikan"} (${escapeHtml(modLabel)})
-          </span>
-        </div>
-        <div class="obs-test-desc">${formatDeskripsiMdn(deskripsi)}</div>
-      `;
-      listContainer.appendChild(itemEl);
-    });
-  } else {
-    obsMetricsWrapper.style.display = "none";
-    obsNoticeBox.style.display = "block";
-    const statusKode = obsSettled.status === "fulfilled" ? obsSettled.value.status : "Timeout/Network";
-    obsRawForJson = obsSettled.status === "fulfilled" ? obsSettled.value.data : { error: statusKode };
-    obsStatusTag.textContent = `Tidak Dipindai (${statusKode})`;
-    obsStatusTag.style.color = "var(--amber)";
-
-    let alasanObservatory = `Server MDN Observatory tidak dapat memindai <code>${escapeHtml(hostname)}</code> (<strong>${escapeHtml(String(statusKode))}</strong>) karena host tidak aktif di internet publik atau menolak pemindai otomatis.`;
-    if (adalahDomainGoogle(hostname)) {
-      alasanObservatory = `Server Google (<code>${escapeHtml(hostname)}</code>) membatasi pemindai otomatis dari server publik MDN Observatory sehingga MDN mengembalikan <strong>HTTP 422</strong> (bukan gangguan koneksi Anda).`;
-    } else if (daftarIp.length === 0) {
-      alasanObservatory = `Rapor keamanan HTTP MDN Observatory tidak tersedia karena alamat <code>${escapeHtml(hostname)}</code> tidak memiliki server aktif di DNS publik.`;
-    }
-    obsNoticeBox.innerHTML = alasanObservatory;
   }
 
   sembunyikanStatus();
@@ -982,27 +1189,28 @@ async function jalankanPemeriksaanTerpadu(inputMentah, paksaSegar = false) {
         aturan_psl_cocok: aturanCocok,
         mode_psl: pslStore.mode
       },
-      tanda_waspada: daftarWaspadaLengkap.map((w) => w.teks),
-      rdap: rdapData || { status: rdapStatusHttp },
-      dns_google: dnsData,
-      mdn_observatory: obsRawForJson
+      tanda_waspada_lokal: tandaWaspadaPsl.map((w) => w.teks),
+      skor_indikator_lokal: risikoLink.skor,
+      pemeriksaan_online: "lihat status pada panel hasil"
     },
     null,
     2
   );
+
+  mulaiPemeriksaanOnline(hostname, domainUtama, requestId);
 }
 
 if (unifiedForm) {
   unifiedForm.addEventListener("submit", (e) => {
     e.preventDefault();
-    jalankanPemeriksaanTerpadu(hostInput.value, false);
+    jalankanPemeriksaanTerpadu(hostInput.value);
   });
 }
 
 document.querySelectorAll("[data-example]").forEach((btn) => {
   btn.addEventListener("click", () => {
     hostInput.value = btn.dataset.example;
-    jalankanPemeriksaanTerpadu(btn.dataset.example, false);
+    jalankanPemeriksaanTerpadu(btn.dataset.example);
   });
 });
 
@@ -1010,7 +1218,7 @@ const rescanBtn = document.getElementById("rescanBtn");
 if (rescanBtn) {
   rescanBtn.addEventListener("click", () => {
     if (!masukanTerakhir) return;
-    jalankanPemeriksaanTerpadu(masukanTerakhir, true);
+    jalankanPemeriksaanTerpadu(masukanTerakhir);
   });
 }
 

@@ -54,70 +54,14 @@ function muatAturanRingkasBawaan() {
   perbaruiBadgePsl();
 }
 
-function parseDanTerapkanPslDat(teksDat) {
-  const nextRules = new Map();
-  const nextExceptions = new Map();
-  let bagianAktif = "ICANN";
-
-  const barisList = teksDat.split(/\r?\n/);
-  for (let i = 0; i < barisList.length; i++) {
-    const baris = barisList[i].trim();
-    if (!baris) continue;
-
-    if (baris.startsWith("//")) {
-      if (baris.includes("===BEGIN ICANN DOMAINS===")) bagianAktif = "ICANN";
-      else if (baris.includes("===BEGIN PRIVATE DOMAINS===")) bagianAktif = "PRIVATE";
-      continue;
-    }
-
-    const token = baris.split(/\s+/)[0].toLowerCase();
-    if (!token) continue;
-
-    const adalahPengecualian = token.startsWith("!");
-    const aturanBersih = adalahPengecualian ? token.slice(1) : token;
-
-    const kandidatAturan = [aturanBersih];
-    if (/[^\x00-\x7F]/.test(aturanBersih)) {
-      try {
-        const asciiRule = new URL("http://" + aturanBersih.replace(/^\*\./, "")).hostname;
-        const prefixedAscii = aturanBersih.startsWith("*.") ? "*." + asciiRule : asciiRule;
-        if (prefixedAscii && prefixedAscii !== aturanBersih) {
-          kandidatAturan.push(prefixedAscii);
-        }
-      } catch (_) {}
-    }
-
-    kandidatAturan.forEach((item) => {
-      if (adalahPengecualian) nextExceptions.set(item, bagianAktif);
-      else nextRules.set(item, bagianAktif);
-    });
-  }
-
-  if (nextRules.size === 0) {
-    throw new Error("Berkas PSL kosong atau format tidak dikenali.");
-  }
-
-  pslStore.rules = nextRules;
-  pslStore.exceptions = nextExceptions;
-  pslStore.mode = "full";
-  pslStore.totalCount = nextRules.size + nextExceptions.size;
-  perbaruiBadgePsl();
-}
-
 function perbaruiBadgePsl() {
   const badge = document.getElementById("pslStatusBadge");
   const note = document.getElementById("pslSourceNote");
   if (!badge || !note) return;
 
-  if (pslStore.mode === "full") {
-    badge.className = "psl-count-badge full";
-    badge.textContent = `PSL Lengkap Dimuat (${pslStore.totalCount.toLocaleString("id-ID")} aturan)`;
-    note.textContent = "Sumber: GitHub publicsuffix/list (ICANN & PRIVATE, MPL-2.0)";
-  } else {
-    badge.className = "psl-count-badge";
-    badge.textContent = `Daftar Ringkas Bawaan (${pslStore.totalCount} aturan)`;
-    note.textContent = "Sumber: publicsuffix.org (MPL-2.0)";
-  }
+  badge.className = "psl-count-badge";
+  badge.textContent = `Daftar lokal ringkas (${pslStore.totalCount} aturan)`;
+  note.textContent = "Tanpa koneksi jaringan; akhiran lain memakai fallback";
 }
 
 // Ekstraksi hostname dari URL lengkap atau domain & validasi alamat IP
