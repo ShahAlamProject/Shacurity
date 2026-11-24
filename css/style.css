@@ -269,6 +269,28 @@ code {
   flex-shrink: 0;
 }
 
+.nav-brand-logo {
+  display: block;
+  width: 132px;
+  height: auto;
+}
+
+.navbar-pill .nav-brand-logo { transform: translateY(2px); }
+
+.logo-dark { display: none; }
+.logo-light { display: block; }
+
+[data-theme="dark"] .logo-dark { display: block; }
+[data-theme="dark"] .logo-light { display: none; }
+[data-theme="dark"] .navbar-pill .nav-brand-logo.logo-dark { width: 156px; }
+
+.footer-brand { margin-bottom: 12px; }
+.footer-brand .nav-brand-logo { width: 160px; }
+[data-theme="dark"] .footer-brand .nav-brand-logo.logo-dark {
+  width: 220px;
+  transform: translateX(-8px);
+}
+
 .nav-brand-icon {
   width: 30px;
   height: 30px;
@@ -824,7 +846,7 @@ code {
 .mini-tag.ok {
   border-color: color-mix(in srgb, var(--green) 45%, transparent);
   background: color-mix(in srgb, var(--green) 12%, transparent);
-  color: var(--text-primary);
+  color: var(--green);
 }
 
 .mini-tag.bad {
@@ -2141,7 +2163,7 @@ code {
   border: 1px solid var(--border);
   border-radius: 14px;
   background: var(--surface-elevated);
-  color: var(--green);
+  color: var(--text-primary);
 }
 .terms-icon svg { width: 24px; height: 24px; }
 .terms-heading h2 {
