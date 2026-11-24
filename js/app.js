@@ -46,6 +46,45 @@ window.addEventListener("scroll", () => {
   if (navbarWrapper) navbarWrapper.classList.toggle("scrolled", window.scrollY > 18);
 }, { passive: true });
 
+const primaryNav = document.querySelector(".nav-center");
+const primaryNavLinks = primaryNav ? primaryNav.querySelectorAll(".nav-link") : [];
+const setActiveNavLink = (href) => {
+  let activeIndex = -1;
+  primaryNavLinks.forEach((link, index) => {
+    if (link.getAttribute("href") === href) {
+      link.setAttribute("aria-current", "page");
+      activeIndex = index;
+    } else {
+      link.removeAttribute("aria-current");
+    }
+  });
+  if (primaryNav && activeIndex >= 0) {
+    primaryNav.style.setProperty("--active-nav-offset", `${activeIndex * 50}px`);
+    primaryNav.classList.add("has-active");
+  } else if (primaryNav) {
+    primaryNav.style.removeProperty("--active-nav-offset");
+    primaryNav.classList.remove("has-active");
+  }
+};
+
+if (window.location.hash) setActiveNavLink(window.location.hash);
+primaryNavLinks.forEach((link) => {
+  link.addEventListener("click", () => setActiveNavLink(link.getAttribute("href")));
+});
+window.addEventListener("hashchange", () => setActiveNavLink(window.location.hash));
+
+const navRailToggle = document.getElementById("navRailToggle");
+if (navbarWrapper && navRailToggle) {
+  navRailToggle.addEventListener("click", () => {
+    const isHidden = navbarWrapper.classList.toggle("nav-hidden");
+    document.body.classList.toggle("nav-rail-hidden", isHidden);
+    const label = isHidden ? "Tampilkan navigasi samping" : "Sembunyikan navigasi samping";
+    navRailToggle.setAttribute("aria-expanded", String(!isHidden));
+    navRailToggle.setAttribute("aria-label", label);
+    navRailToggle.setAttribute("title", label);
+  });
+}
+
 const mobileMenuTrigger = document.getElementById("mobileMenuTrigger");
 const mobileSheet = document.getElementById("mobileSheet");
 if (mobileMenuTrigger && mobileSheet) {

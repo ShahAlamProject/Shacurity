@@ -53,9 +53,30 @@
       </a>
 
       <nav class="nav-center" aria-label="Navigasi Utama">
-        <a href="#features" class="nav-link">Fitur</a>
-        <a href="#lab-keamanan" class="nav-link">Lab Keamanan</a>
-        <a href="#faq" class="nav-link">FAQ</a>
+        <a href="#features" class="nav-link" aria-label="Fitur" title="Fitur">
+          <svg class="nav-link-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7" rx="1.5"></rect>
+            <rect x="14" y="3" width="7" height="7" rx="1.5"></rect>
+            <rect x="3" y="14" width="7" height="7" rx="1.5"></rect>
+            <rect x="14" y="14" width="7" height="7" rx="1.5"></rect>
+          </svg>
+          <span class="nav-link-label">Fitur</span>
+        </a>
+        <a href="#lab-keamanan" class="nav-link" aria-label="Lab Keamanan" title="Lab Keamanan">
+          <svg class="nav-link-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3 19 6v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6l7-3Z"></path>
+            <path d="m9 12 2 2 4-4"></path>
+          </svg>
+          <span class="nav-link-label">Lab Keamanan</span>
+        </a>
+        <a href="#faq" class="nav-link" aria-label="FAQ" title="FAQ">
+          <svg class="nav-link-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="9"></circle>
+            <path d="M9.6 9a2.5 2.5 0 1 1 4.2 1.8c-1.1 1-1.8 1.3-1.8 2.7"></path>
+            <path d="M12 17h.01"></path>
+          </svg>
+          <span class="nav-link-label">FAQ</span>
+        </a>
       </nav>
 
       <div class="nav-right">
@@ -93,6 +114,14 @@
       </div>
     </div>
   </div>
+  <button class="nav-rail-toggle" id="navRailToggle" type="button" aria-label="Sembunyikan navigasi samping" aria-expanded="true" title="Sembunyikan navigasi samping">
+    <svg class="nav-rail-toggle-hide" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="m9 18 6-6-6-6"></path>
+    </svg>
+    <svg class="nav-rail-toggle-show" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="m15 18-6-6 6-6"></path>
+    </svg>
+  </button>
 
   <!-- ========================================================================
        HERO (DOMAINUTAMA PSL, RAPOR WEBSITE, DETEKSI PHISHING & CEK FILE)
