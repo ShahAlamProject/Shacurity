@@ -236,6 +236,7 @@ code {
 
 .navbar-pill {
   pointer-events: auto;
+  width: 100%;
   max-width: 1120px;
   margin: 0 auto;
   height: clamp(54px, 7vw, 62px);
@@ -250,7 +251,8 @@ code {
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  transition: max-width 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+  transition: width 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+              max-width 0.3s cubic-bezier(0.22, 1, 0.36, 1),
               border-color 0.25s ease,
               box-shadow 0.25s ease;
 }
@@ -294,18 +296,22 @@ code {
 }
 
 .footer-brand {
-  width: 220px;
-  height: 80px;
+  width: 280px;
+  height: 96px;
   margin-bottom: 12px;
 }
-.footer-brand .nav-brand-logo { width: 160px; }
+.footer-brand .nav-brand-logo { width: 190px; }
 .footer-brand .nav-brand-logo.logo-light {
-  width: 198px;
+  width: 238px;
   transform: translate(3.05px, 1.04px);
 }
 [data-theme="dark"] .footer-brand .nav-brand-logo.logo-dark {
-  width: 220px;
+  width: 260px;
   transform: translateX(-8px);
+}
+.footer-brand .nav-brand-logo.logo-mobile-dark,
+.footer-brand .nav-brand-logo.logo-mobile-light {
+  display: none;
 }
 
 .nav-brand-icon {
@@ -2438,6 +2444,25 @@ code {
   }
 
   .footer-cols { grid-template-columns: 1fr; }
+  .footer-brand {
+    width: 72px;
+    height: 72px;
+  }
+  .footer-brand .nav-brand-logo.logo-dark,
+  .footer-brand .nav-brand-logo.logo-light {
+    display: none;
+  }
+  .footer-brand .nav-brand-logo.logo-mobile-dark,
+  .footer-brand .nav-brand-logo.logo-mobile-light {
+    width: 64px;
+    height: 64px;
+    object-fit: contain;
+    transform: none;
+  }
+  [data-theme="dark"] .footer-brand .nav-brand-logo.logo-mobile-dark,
+  [data-theme="light"] .footer-brand .nav-brand-logo.logo-mobile-light {
+    display: block;
+  }
 }
 
 @media (max-width: 375px) {
@@ -2721,5 +2746,15 @@ code {
   .navbar-pill .nav-brand-logo.logo-mobile-light {
     width: 56px;
     height: 56px;
+  }
+
+  .navbar-wrapper.scrolled .navbar-pill {
+    width: 91%;
+  }
+}
+
+@media (max-width: 1024px) and (orientation: landscape) and (min-aspect-ratio: 9/5) {
+  .navbar-wrapper.scrolled .navbar-pill {
+    width: 91%;
   }
 }
